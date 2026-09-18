@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jev 说明 · 一个不说话的模型</title>
+  <meta name="description" content="Jev / TypeSafe System One 的极简图解说明：它不生成文本，只做类型化判断。">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.css">
+  <style>
+    :root {
+      --paper: #fff;
+      --white: #fff;
+      --ink: #11100f;
+      --muted: #8f8d88;
+      --line: #c9c7c1;
+      --fog: #e9e8e4;
+      --font-zh-sans: "Source Han Sans SC", "Source Han Sans CN", "思源黑体 CN", "Noto Sans CJK SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-latin: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --font-zh: var(--font-zh-sans);
+    }
+
+    body { background: var(--paper); }
+
+    .reveal {
+      color: var(--ink);
+      font-family: var(--font-zh);
+      font-size: 28px;
+      font-kerning: normal;
+      text-rendering: geometricPrecision;
+    }
+
+    .reveal .slides { text-align: left; }
+    .reveal .slides section {
+      box-sizing: border-box;
+      height: 1080px;
+      padding: 72px 88px 84px;
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal p { margin: 0; }
+    .reveal h1, .reveal h2, .reveal h3 {
+      color: var(--ink);
+      font-family: var(--font-zh);
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+      text-shadow: none;
+    }
+
+    .latin { font-family: var(--font-latin); }
+    .reveal .tag {
+      display: inline-block;
+      padding: 8px 22px 7px;
+      color: var(--white);
+      background: var(--ink);
+      font-family: var(--font-latin);
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .reveal .tag-center { display: table; margin-inline: auto; }
+
+    .invert {
+      padding: 0 .12em .04em;
+      color: var(--white);
+      background: var(--ink);
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    .chapter-footer {
+      position: absolute;
+      left: 50%;
+      bottom: 34px;
+      display: grid;
+      justify-items: center;
+      transform: translateX(-50%);
+      line-height: 1;
+    }
+    .chapter-footer strong { font-size: 24px; letter-spacing: .48em; margin-right: -.48em; }
+    .chapter-footer span { margin-top: 8px; padding: 2px 5px; color: var(--white); background: var(--ink); font: 14px/1 var(--font-latin); }
+
+    /* 封面 */
+    .cover { display: grid !important; place-items: center; }
+    .cover-composition { position: relative; width: 1120px; height: 520px; }
+    .cover-title {
+      position: absolute;
+      inset: 30px 335px 40px 335px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      font-size: 116px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .cover-word { position: absolute; font: 46px/1 var(--font-latin); color: var(--ink); }
+    .cover-word.a { right: 30px; top: 132px; transform: rotate(90deg); }
+    .cover-word.b { right: 168px; top: 214px; }
+    .cover-word.c { left: 152px; top: 214px; }
+    .cover-word.d { left: -6px; top: 158px; transform: rotate(90deg); }
+    .author-tag { position: absolute; left: 50%; bottom: 108px; transform: translateX(-50%); }
+    .cover-meta { position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%); font: 17px/1 var(--font-latin); color: var(--muted); letter-spacing: .1em; }
+
+    /* 章节页 */
+    .section-opener { padding: 0 !important; }
+    .section-art { position: absolute; inset: 0 320px 0 0; width: calc(100% - 320px); height: 100%; }
+    .section-art svg { width: 100%; height: 100%; display: block; }
+    .vertical-lockup { position: absolute; right: 92px; top: 230px; display: flex; align-items: flex-start; gap: 14px; }
+    /* 中文竖排用逐字块堆叠，不用 writing-mode：
+       后者在 flex 项里行内尺寸不定，部分 Chrome 版本会把整列压成一行。 */
+    .vertical-lockup h2 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 96px;
+      font-weight: 700;
+      line-height: 1.06;
+    }
+    .vertical-lockup h2 b { font-weight: 700; }
+    .vertical-lockup p {
+      writing-mode: vertical-rl;
+      align-self: flex-start;
+      padding: 12px 7px;
+      color: var(--white);
+      background: var(--ink);
+      font: 26px/1 var(--font-latin);
+      letter-spacing: .04em;
+    }
+    .section-index { position: absolute; right: 96px; bottom: 64px; font: 16px/1 var(--font-latin); color: var(--muted); letter-spacing: .2em; }
+
+    /* 框架正文页 */
+    .frame-slide { padding: 72px 46px 84px !important; }
+    .content-frame {
+      position: relative;
+      box-sizing: border-box;
+      height: 822px;
+      margin-top: 42px;
+      padding: 88px 64px 56px;
+      border: 2px solid var(--ink);
+    }
+    .top-tab { position: absolute; left: 50%; top: -36px; transform: translateX(-50%); padding: 16px 52px 14px; font: 38px/1 var(--font-zh); }
+    .columns { display: grid; grid-template-columns: 1.08fr .92fr; gap: 74px; height: 100%; }
+    .column { min-width: 0; }
+    .lead { margin-bottom: 34px !important; font-size: 32px; font-weight: 700; line-height: 1.45; }
+    .body-copy { font-size: 27px; line-height: 1.5; }
+    .body-copy p + p { margin-top: 24px; }
+    .body-copy ul { margin: 14px 0 0 1.1em; }
+    .body-copy li { margin: 11px 0; }
+    .muted-block { margin-top: 24px; padding: 22px 26px; background: var(--fog); font-size: 25px; line-height: 1.5; }
+
+    /* 巨句页 */
+    .statement { display: grid !important; place-items: center; }
+    .statement-wrap { width: 1450px; }
+    .statement h2 { font-size: 92px; font-weight: 700; line-height: 1.22; text-align: center; }
+    .statement .tag { display: table; margin: 34px auto 0; }
+
+    /* 图解页 */
+    .diagram { padding: 76px 100px 70px !important; }
+    .diagram svg { width: 100%; height: 700px; display: block; }
+    .diagram-title { margin-top: 10px !important; font-size: 56px; font-weight: 700; text-align: center; }
+    .diagram-note { margin-top: 16px !important; font-size: 22px; text-align: center; color: var(--muted); }
+
+    /* 数字页 */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 0; row-gap: 62px; margin-top: 96px; }
+    .stat { padding: 0 44px; border-left: 1px solid var(--line); }
+    .stat:nth-child(3n+1) { border-left: 0; padding-left: 0; }
+    .stat b { display: block; font: 700 82px/1 var(--font-latin); letter-spacing: -.02em; }
+    .stat b small { font-size: 34px; font-weight: 400; letter-spacing: 0; }
+    .stat span { display: block; margin-top: 16px; font-size: 24px; color: var(--muted); }
+    .stats-head { font-size: 44px; font-weight: 700; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal .slides section { transition: none !important; }
+    }
+
+    /* 播放控件 */
+    .deck-controls {
+      position: fixed; right: 20px; bottom: 18px; z-index: 2000;
+      display: flex; align-items: stretch; min-height: 38px;
+      color: var(--ink); background: rgba(255,255,255,.94);
+      border: 1px solid var(--ink);
+      font: 13px/1 var(--font-latin);
+      opacity: .56; transition: opacity .18s ease;
+    }
+    .deck-controls:hover, .deck-controls:focus-within { opacity: 1; }
+    .deck-control, .deck-dot { color: inherit; background: transparent; border: 0; border-radius: 0; cursor: pointer; }
+    .deck-control { display: grid; width: 38px; place-items: center; padding: 0; border-left: 1px solid var(--line); }
+    .deck-control:first-child { border-left: 0; }
+    .deck-control:hover, .deck-control[aria-pressed="true"] { color: var(--white); background: var(--ink); }
+    .deck-control:disabled { cursor: default; opacity: .2; }
+    .deck-control svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+    .slide-count { display: grid; min-width: 68px; place-items: center; border-left: 1px solid var(--line); letter-spacing: .08em; }
+    .deck-dots { display: flex; align-items: center; gap: 7px; padding: 0 12px; border-left: 1px solid var(--line); }
+    .deck-dot { width: 5px; height: 5px; padding: 0; background: var(--line); transition: width .18s ease, background .18s ease; }
+    .deck-dot:hover { background: var(--muted); }
+    .deck-dot.active { width: 18px; background: var(--ink); }
+    .deck-control:focus-visible, .deck-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+
+    @media print {
+      body { background: var(--white); }
+      .reveal .slides section { page-break-after: always; }
+      .deck-controls { display: none !important; }
+    }
+    body.print-pdf .deck-controls { display: none !important; }
+  </style>
+</head>
+<body data-font-mode="sans">
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 01 封面 -->
+    <section class="cover" aria-label="封面：不说话的模型">
+      <div class="cover-composition">
+        <div class="cover-title"><b>不说话</b><b>的模型</b></div>
+        <span class="cover-word a">Jev</span>
+        <span class="cover-word b">No</span>
+        <span class="cover-word c">One</span>
+        <span class="cover-word d">System</span>
+      </div>
+      <span class="tag author-tag">TypeSafe System One</span>
+      <span class="cover-meta">2026.09.15 · AWESOME-JEV-ZH</span>
+    </section>
+
+    <!-- 02 章节一 -->
+    <section class="section-opener" aria-label="章节一：不说话">
+      <div class="section-art" role="img" aria-label="线稿：一排整齐的候选卡片中，唯一一张被机械臂取出并涂黑">
+        <svg viewBox="0 0 1600 1080" fill="none" stroke="#11100f" stroke-width="3">
+          <!-- 候选集合：整齐、等价、闭集 -->
+          <g stroke-width="2.5">
+            <rect x="300" y="500" width="40" height="190"/>
+            <rect x="356" y="500" width="40" height="190"/>
+            <rect x="412" y="500" width="40" height="190"/>
+            <rect x="468" y="500" width="40" height="190"/>
+            <rect x="524" y="500" width="40" height="190"/>
+            <rect x="580" y="500" width="40" height="190"/>
+            <rect x="636" y="500" width="40" height="190"/>
+            <rect x="692" y="500" width="40" height="190"/>
+            <rect x="804" y="500" width="40" height="190"/>
+            <rect x="860" y="500" width="40" height="190"/>
+            <rect x="916" y="500" width="40" height="190"/>
+            <rect x="972" y="500" width="40" height="190"/>
+            <rect x="1028" y="500" width="40" height="190"/>
+            <rect x="1084" y="500" width="40" height="190"/>
+            <rect x="1140" y="500" width="40" height="190"/>
+          </g>
+          <!-- 被选中的那一张：唯一被取出，涂实 -->
+          <rect x="748" y="238" width="40" height="190" fill="#11100f" stroke="none"/>
+          <!-- 留下的空位 -->
+          <g stroke-width="2" stroke-dasharray="7 10">
+            <path d="M748 500 v190"/><path d="M788 500 v190"/><path d="M748 500 h40"/><path d="M748 690 h40"/>
+          </g>
+          <!-- 取出轨迹 -->
+          <path d="M768 500 V428" stroke-width="2" stroke-dasharray="6 11"/>
+          <!-- 送进代码 -->
+          <path d="M768 238 V150 H1210" stroke-width="4"/>
+          <circle cx="768" cy="150" r="9" fill="#11100f" stroke="none"/>
+          <rect x="1210" y="112" width="76" height="76" stroke-width="3"/>
+          <path d="M1232 150 h32 M1248 134 v32" stroke-width="3"/>
+          <!-- 密度焦点：候选之间的等价关系 -->
+          <g stroke-width="1.6" stroke-dasharray="3 7">
+            <path d="M320 470 H1140"/>
+            <path d="M320 720 H1140"/>
+          </g>
+        </svg>
+      </div>
+      <div class="vertical-lockup">
+        <p>No Prose</p>
+        <h2><b>不</b><b>说</b><b>话</b></h2>
+      </div>
+      <span class="section-index">01</span>
+    </section>
+
+    <!-- 03 图解：两条路径 -->
+    <section class="diagram" aria-label="图解：两条路径对比">
+      <svg viewBox="0 0 1720 600" style="height:600px" fill="none" stroke="#11100f" stroke-width="2.5">
+        <!-- 上：LLM 路径 -->
+        <text x="0" y="52" font-family="Helvetica Neue, Arial" font-size="22" fill="#8f8d88" stroke="none" letter-spacing="3">LLM</text>
+        <g>
+          <rect x="0" y="86" width="230" height="92"/>
+          <rect x="290" y="86" width="230" height="92"/>
+          <rect x="580" y="86" width="230" height="92"/>
+          <rect x="870" y="86" width="230" height="92"/>
+          <rect x="1160" y="86" width="230" height="92"/>
+        </g>
+        <g stroke-width="2">
+          <path d="M230 132 h50"/><path d="M520 132 h50"/><path d="M810 132 h50"/><path d="M1100 132 h50"/>
+          <path d="M272 126 l10 6 -10 6"/><path d="M562 126 l10 6 -10 6"/><path d="M852 126 l10 6 -10 6"/><path d="M1142 126 l10 6 -10 6"/>
+        </g>
+        <g font-family="var(--font-zh)" font-size="25" fill="#11100f" stroke="none" text-anchor="middle">
+          <text x="115" y="140">拼 prompt</text>
+          <text x="405" y="140">逐 token 生成</text>
+          <text x="695" y="140">解析 JSON</text>
+          <text x="985" y="140">校验 / 重试</text>
+          <text x="1275" y="140">拿到一个枚举</text>
+        </g>
+        <!-- 重试回环 -->
+        <path d="M985 178 v46 h-290 v-46" stroke-dasharray="6 9" stroke-width="2"/>
+        <text x="840" y="248" font-size="20" fill="#8f8d88" stroke="none" text-anchor="middle">失败则重来</text>
+        <text x="1440" y="140" font-family="Helvetica Neue, Arial" font-size="30" fill="#11100f" stroke="none">≈ 800ms</text>
+
+        <!-- 分隔 -->
+        <path d="M0 330 h1720" stroke="#c9c7c1" stroke-width="1.5"/>
+
+        <!-- 下：Jev 路径 -->
+        <text x="0" y="412" font-family="Helvetica Neue, Arial" font-size="22" fill="#8f8d88" stroke="none" letter-spacing="3">JEV</text>
+        <rect x="0" y="446" width="230" height="92"/>
+        <text x="115" y="500" font-size="25" fill="#11100f" stroke="none" text-anchor="middle">state + 问题</text>
+        <!-- 并行 pass -->
+        <rect x="580" y="410" width="230" height="164" fill="#11100f" stroke="none"/>
+        <text x="695" y="500" font-size="25" fill="#ffffff" stroke="none" text-anchor="middle">一次并行 pass</text>
+        <g stroke-width="2">
+          <path d="M230 470 h350"/><path d="M230 492 h350"/><path d="M230 514 h350"/>
+          <path d="M810 470 h350"/><path d="M810 492 h350"/><path d="M810 514 h350"/>
+        </g>
+        <rect x="1160" y="446" width="230" height="92"/>
+        <text x="1275" y="500" font-size="25" fill="#11100f" stroke="none" text-anchor="middle">类型化的值</text>
+        <text x="1440" y="500" font-family="Helvetica Neue, Arial" font-size="30" fill="#11100f" stroke="none">70–500ms</text>
+      </svg>
+      <h2 class="diagram-title">同一件事，两条路径</h2>
+      <p class="diagram-note">上面那条路里，生成能力全是浪费——而且是有害的浪费，因为生成意味着它可能生成出你没定义的东西。</p>
+    </section>
+
+    <!-- 04 巨句 -->
+    <section class="statement" aria-label="核心主张">
+      <div class="statement-wrap">
+        <h2>你要的，<br>只是一道选择题</h2>
+        <span class="tag">The Real Ask</span>
+      </div>
+    </section>
+
+    <!-- 05 三个原语 -->
+    <section class="frame-slide" aria-label="三个原语">
+      <div class="content-frame">
+        <span class="tag top-tab">三个原语</span>
+        <div class="columns">
+          <div class="column body-copy">
+            <p class="lead">所有 Jev 请求都是同一个形状：一份 state，加一组带类型的问题。问题只有三种。</p>
+            <p><span class="invert">Choice</span>　从你给的选项里选一个。返回命中的 key、完整概率分布与置信度。单个问题最多 255 个候选。</p>
+            <p><span class="invert">Score</span>　在你给的量表上打一个分。返回的是小数，落在档位之间，比档位本身更细。</p>
+            <p><span class="invert">Noul</span>　这句陈述为真的概率，0 到 1。护栏、审核、语义检索都靠它。</p>
+          </div>
+          <div class="column body-copy">
+            <p class="lead">同一次请求里的问题，对同一份 state 并行求值、彼此隔离。</p>
+            <p>问题之间互相看不见。这既是它快的原因，也画出了它的边界：需要串联推理的任务不适合它。</p>
+            <div class="muted-block">核心心法只有一句：<strong>问题尽量原子，组合逻辑写在你自己的代码里。</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="chapter-footer"><strong>不 说 话</strong><span>No Prose</span></div>
+    </section>
+
+    <!-- 06 章节二 -->
+    <section class="section-opener" aria-label="章节二：快与便宜">
+      <div class="section-art" role="img" aria-label="线稿：多条平行线同时抵达一根竖线，旁有刻度盘">
+        <svg viewBox="0 0 1600 1080" fill="none" stroke="#11100f" stroke-width="3">
+          <!-- 平行线束，同时到达 -->
+          <g stroke-width="2.5">
+            <path d="M180 300 H1080"/><path d="M240 360 H1080"/><path d="M150 420 H1080"/>
+            <path d="M300 480 H1080"/><path d="M200 540 H1080"/><path d="M260 600 H1080"/>
+            <path d="M170 660 H1080"/><path d="M320 720 H1080"/><path d="M220 780 H1080"/>
+          </g>
+          <!-- 同步到达的竖线 -->
+          <path d="M1080 250 V830" stroke-width="6"/>
+          <!-- 到达点 -->
+          <g fill="#11100f" stroke="none">
+            <circle cx="1080" cy="300" r="7"/><circle cx="1080" cy="360" r="7"/><circle cx="1080" cy="420" r="7"/>
+            <circle cx="1080" cy="480" r="7"/><circle cx="1080" cy="540" r="7"/><circle cx="1080" cy="600" r="7"/>
+            <circle cx="1080" cy="660" r="7"/><circle cx="1080" cy="720" r="7"/><circle cx="1080" cy="780" r="7"/>
+          </g>
+          <!-- 刻度盘 -->
+          <circle cx="1080" cy="540" r="132" stroke-width="3" stroke-dasharray="4 14"/>
+          <path d="M1080 540 L1160 470" stroke-width="5"/>
+          <circle cx="1080" cy="540" r="10" fill="#11100f" stroke="none"/>
+          <!-- 起点参差的刻度 -->
+          <path d="M120 250 V830" stroke-width="2" stroke-dasharray="6 10"/>
+        </svg>
+      </div>
+      <div class="vertical-lockup">
+        <p>Speed &amp; Cost</p>
+        <h2><b>快</b><b>与</b><b>便</b><b>宜</b></h2>
+      </div>
+      <span class="section-index">02</span>
+    </section>
+
+    <!-- 07 规格数字 -->
+    <section aria-label="规格与成本">
+      <h3 class="stats-head">规格与成本</h3>
+      <div class="stats">
+        <div class="stat"><b>0.042<small> / MTok</small></b><span>输入价格，美元</span></div>
+        <div class="stat"><b>0<small> / MTok</small></b><span>输出价格，不计费</span></div>
+        <div class="stat"><b>70–500<small> ms</small></b><span>端到端延迟</span></div>
+        <div class="stat"><b>64<small> k</small></b><span>上下文，state ≤ 32k</span></div>
+        <div class="stat"><b>255</b><span>单个 Choice 候选上限</span></div>
+        <div class="stat"><b>1<small> 种</small></b><span>输入模态：纯文本</span></div>
+      </div>
+      <div class="muted-block" style="margin-top:96px;font-size:27px;">
+        比起「快 N 倍」的口号，两个实例更有说服力：官方 Doom demo 每秒 10 次查询，约 <strong>$7 / 小时</strong>；browser-use 订一张机票全程 <strong>7 秒 / $0.0039</strong>。
+      </div>
+      <div class="chapter-footer"><strong>快 与 便 宜</strong><span>Speed &amp; Cost</span></div>
+    </section>
+
+    <!-- 08 章节三 -->
+    <section class="section-opener" aria-label="章节三：怎么用对">
+      <div class="section-art" role="img" aria-label="线稿：带刻度的阀门把一股流分成宽窄不同的三路">
+        <svg viewBox="0 0 1600 1080" fill="none" stroke="#11100f" stroke-width="3">
+          <!-- 进流 -->
+          <path d="M120 540 H600" stroke-width="30"/>
+          <!-- 阀体 -->
+          <rect x="600" y="400" width="150" height="280" stroke-width="4"/>
+          <!-- 阀体刻度 -->
+          <g stroke-width="2">
+            <path d="M600 440 h34"/><path d="M600 480 h22"/><path d="M600 520 h34"/>
+            <path d="M600 560 h22"/><path d="M600 600 h34"/><path d="M600 640 h22"/>
+          </g>
+          <path d="M675 400 V300" stroke-width="5"/>
+          <path d="M620 300 h110" stroke-width="5"/>
+          <!-- 三路出流，宽窄不同 -->
+          <path d="M750 470 H1340" stroke-width="22"/>
+          <path d="M750 540 H1180" stroke-width="10"/>
+          <path d="M750 610 C900 610 980 700 1060 760" stroke-width="4"/>
+          <!-- 终点标记 -->
+          <g fill="#11100f" stroke="none">
+            <rect x="1340" y="452" width="36" height="36"/>
+          </g>
+          <circle cx="1180" cy="540" r="16" stroke-width="3"/>
+          <path d="M1046 746 l28 28 M1074 746 l-28 28" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="vertical-lockup">
+        <p>How to Use</p>
+        <h2><b>怎</b><b>么</b><b>用</b><b>对</b></h2>
+      </div>
+      <span class="section-index">03</span>
+    </section>
+
+    <!-- 09 置信度门控 -->
+    <section class="frame-slide" aria-label="置信度门控">
+      <div class="content-frame">
+        <span class="tag top-tab">置信度门控</span>
+        <div class="columns">
+          <div class="column body-copy">
+            <p class="lead">答案告诉你「是什么」，置信度告诉你「要不要直接动手」。</p>
+            <p>绝大多数把 Jev 用砸的案例，都是拿着结果直接执行，不看 confidence。正确姿势是三段：高置信直接执行，中置信执行但打标，低置信上抛给 LLM 或人工。</p>
+            <div class="muted-block">阈值不能拍脑袋。跑一批你自己的真实数据，按置信度分桶统计准确率——模型宣称是校准的，0.7 那一桶长期就该在 70% 附近。<strong>这张表既是在定阈值，也是在验证它在你的数据上到底校不校准。</strong></div>
+          </div>
+          <div class="column body-copy">
+            <p class="lead">低置信度有两种成因，概率分布能分辨。</p>
+            <p><span class="invert">前两名咬得很紧</span>　这条输入本身就跨两类，人来判也会犹豫。该上抛，或者承认你的分类体系有重叠。</p>
+            <p><span class="invert">分布接近均匀</span>　模型没抓到信号。多半是 state 信息不够，或判据写得太模糊。</p>
+          </div>
+        </div>
+      </div>
+      <div class="chapter-footer"><strong>怎 么 用 对</strong><span>How to Use</span></div>
+    </section>
+
+    <!-- 10 投机扇出 -->
+    <section class="diagram" aria-label="图解：投机扇出">
+      <svg viewBox="0 0 1720 600" style="height:600px" fill="none" stroke="#11100f" stroke-width="2.5">
+        <rect x="0" y="270" width="250" height="160" stroke-width="3"/>
+        <text x="125" y="340" font-size="27" fill="#11100f" stroke="none" text-anchor="middle">一份 state</text>
+        <text x="125" y="380" font-size="21" fill="#8f8d88" stroke="none" text-anchor="middle">只算一次钱</text>
+
+        <!-- 扇出 -->
+        <g stroke-width="2">
+          <path d="M250 350 C420 350 460 70 640 70"/>
+          <path d="M250 350 C420 350 460 150 640 150"/>
+          <path d="M250 350 C420 350 460 230 640 230"/>
+          <path d="M250 350 C420 350 460 310 640 310"/>
+          <path d="M250 350 C420 350 460 390 640 390"/>
+          <path d="M250 350 C420 350 460 470 640 470"/>
+          <path d="M250 350 C420 350 460 550 640 550"/>
+          <path d="M250 350 C420 350 460 630 640 630"/>
+        </g>
+
+        <!-- 问题节点 -->
+        <g>
+          <rect x="640" y="44" width="300" height="52"/><rect x="640" y="124" width="300" height="52"/>
+          <rect x="640" y="204" width="300" height="52"/><rect x="640" y="284" width="300" height="52"/>
+          <rect x="640" y="364" width="300" height="52"/><rect x="640" y="444" width="300" height="52"/>
+          <rect x="640" y="524" width="300" height="52"/><rect x="640" y="604" width="300" height="52"/>
+        </g>
+        <g font-size="22" fill="#11100f" stroke="none">
+          <text x="664" y="78">department</text><text x="664" y="158">is_spam</text>
+          <text x="664" y="238">is_urgent</text><text x="664" y="318">frustration</text>
+          <text x="664" y="398">wants_refund</text><text x="664" y="478">needs_human</text>
+          <text x="664" y="558">is_duplicate</text><text x="664" y="638">language</text>
+        </g>
+
+        <!-- 代码里筛：实线保留，虚线丢弃 -->
+        <g stroke-width="2">
+          <path d="M940 70 H1180"/><path d="M940 150 H1180"/>
+          <path d="M940 230 H1180" stroke-dasharray="5 9"/>
+          <path d="M940 310 H1180"/>
+          <path d="M940 390 H1180" stroke-dasharray="5 9"/>
+          <path d="M940 470 H1180" stroke-dasharray="5 9"/>
+          <path d="M940 550 H1180"/>
+          <path d="M940 630 H1180" stroke-dasharray="5 9"/>
+        </g>
+        <path d="M1180 20 V680" stroke-width="3"/>
+        <text x="1206" y="330" font-size="27" fill="#11100f" stroke="none">你的代码在这里筛</text>
+        <text x="1206" y="372" font-size="21" fill="#8f8d88" stroke="none">虚线 = 这次用不上，但问了也不加钱</text>
+      </svg>
+      <h2 class="diagram-title">输出免费，所以多问不要钱</h2>
+      <p class="diagram-note">一次请求问 1 个问题和问 20 个问题，成本几乎一样——state 只算一次。上限是 64k 上下文。</p>
+    </section>
+
+    <!-- 11 章节四 -->
+    <section class="section-opener" aria-label="章节四：证据">
+      <div class="section-art" role="img" aria-label="线稿：一根粗线被梳成五股细线，经刻度后重新拧成一根更高的缆">
+        <svg viewBox="0 0 1600 1080" fill="none" stroke="#11100f" stroke-width="3">
+          <!-- 粗线进 -->
+          <path d="M120 700 H480" stroke-width="26"/>
+          <!-- 梳齿 -->
+          <g stroke-width="4">
+            <path d="M500 590 V810"/>
+            <path d="M500 590 h-28"/><path d="M500 810 h-28"/>
+          </g>
+          <!-- 五股 -->
+          <g stroke-width="3">
+            <path d="M500 700 C620 700 660 600 800 600"/>
+            <path d="M500 700 C620 700 660 650 800 650"/>
+            <path d="M500 700 H800"/>
+            <path d="M500 700 C620 700 660 750 800 750"/>
+            <path d="M500 700 C620 700 660 800 800 800"/>
+          </g>
+          <!-- 刻度栅 -->
+          <g stroke-width="2">
+            <path d="M800 560 V840"/>
+            <path d="M800 600 h26"/><path d="M800 650 h26"/><path d="M800 700 h26"/><path d="M800 750 h26"/><path d="M800 800 h26"/>
+          </g>
+          <!-- 重新汇聚并抬升 -->
+          <g stroke-width="3">
+            <path d="M826 600 C960 600 1000 400 1160 400"/>
+            <path d="M826 650 C960 650 1000 410 1160 410"/>
+            <path d="M826 700 C960 700 1000 420 1160 420"/>
+            <path d="M826 750 C960 750 1000 430 1160 430"/>
+            <path d="M826 800 C960 800 1000 440 1160 440"/>
+          </g>
+          <path d="M1160 390 H1420" stroke-width="30"/>
+          <!-- 抬升量标注 -->
+          <path d="M1460 420 V700" stroke-width="2" stroke-dasharray="6 10"/>
+          <path d="M1452 420 h16" stroke-width="2"/><path d="M1452 700 h16" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="vertical-lockup">
+        <p>Evidence</p>
+        <h2><b>证</b><b>据</b></h2>
+      </div>
+      <span class="section-index">04</span>
+    </section>
+
+    <!-- 12 证据条形图 -->
+    <section class="diagram" aria-label="图解：钓鱼邮件评测准确率对比">
+      <svg viewBox="0 0 1720 660" style="height:640px" fill="none" stroke="#11100f" stroke-width="2.5">
+        <!-- 轴 -->
+        <path d="M430 40 V600" stroke-width="2.5"/>
+        <g stroke="#c9c7c1" stroke-width="1.5" stroke-dasharray="5 8">
+          <path d="M686 40 V600"/><path d="M942 40 V600"/><path d="M1198 40 V600"/><path d="M1454 40 V600"/>
+        </g>
+        <g font-family="Helvetica Neue, Arial" font-size="19" fill="#8f8d88" stroke="none" text-anchor="middle">
+          <text x="686" y="636">60%</text><text x="942" y="636">75%</text><text x="1198" y="636">90%</text><text x="1454" y="636">100%</text>
+        </g>
+
+        <!-- 条：起点 430 对应 50%，1454 对应 100% -->
+        <!-- 62.6 -->
+        <rect x="430" y="70" width="258" height="72" fill="#11100f" stroke="none"/>
+        <text x="400" y="118" font-size="26" fill="#11100f" stroke="none" text-anchor="end">直接问 Jev</text>
+        <text x="710" y="118" font-family="Helvetica Neue, Arial" font-size="32" fill="#11100f" stroke="none">62.6</text>
+        <!-- 81.3 -->
+        <rect x="430" y="202" width="641" height="72" fill="none" stroke="#11100f" stroke-width="2.5"/>
+        <text x="400" y="250" font-size="26" fill="#11100f" stroke="none" text-anchor="end">Claude Haiku 4.5</text>
+        <text x="1093" y="250" font-family="Helvetica Neue, Arial" font-size="32" fill="#11100f" stroke="none">81.3</text>
+        <!-- 91.8 -->
+        <rect x="430" y="334" width="856" height="72" fill="none" stroke="#11100f" stroke-width="2.5"/>
+        <g stroke="#11100f" stroke-width="1.5">
+          <path d="M440 406 L512 334"/><path d="M500 406 L572 334"/><path d="M560 406 L632 334"/><path d="M620 406 L692 334"/>
+          <path d="M680 406 L752 334"/><path d="M740 406 L812 334"/><path d="M800 406 L872 334"/><path d="M860 406 L932 334"/>
+          <path d="M920 406 L992 334"/><path d="M980 406 L1052 334"/><path d="M1040 406 L1112 334"/><path d="M1100 406 L1172 334"/>
+          <path d="M1160 406 L1232 334"/><path d="M1220 406 L1286 340"/>
+        </g>
+        <text x="400" y="382" font-size="26" fill="#11100f" stroke="none" text-anchor="end">两行正则规则</text>
+        <text x="1308" y="382" font-family="Helvetica Neue, Arial" font-size="32" fill="#11100f" stroke="none">91.8</text>
+        <!-- 95.0 -->
+        <rect x="430" y="466" width="922" height="72" fill="#11100f" stroke="none"/>
+        <text x="400" y="514" font-size="26" fill="#11100f" stroke="none" text-anchor="end">拆成 5 个信号 + 回归</text>
+        <text x="1374" y="514" font-family="Helvetica Neue, Arial" font-size="32" fill="#11100f" stroke="none">95.0</text>
+      </svg>
+      <h2 class="diagram-title">同一个模型，差 32 个百分点</h2>
+      <p class="diagram-note">2000 封钓鱼邮件，独立评测 jev-phishing-bench。差别只在于：让模型做判断，还是让模型提供信号、由你的代码做判断。</p>
+    </section>
+
+    <!-- 13 章节五 -->
+    <section class="section-opener" aria-label="章节五：边界">
+      <div class="section-art" role="img" aria-label="线稿：一条硬边界，一侧是致密网格，另一侧完全空白">
+        <svg viewBox="0 0 1600 1080" fill="none" stroke="#11100f" stroke-width="3">
+          <!-- 致密网格（左） -->
+          <g stroke-width="1.6">
+            <path d="M200 260 H1000"/><path d="M200 300 H1000"/><path d="M200 340 H1000"/><path d="M200 380 H1000"/>
+            <path d="M200 420 H1000"/><path d="M200 460 H1000"/><path d="M200 500 H1000"/><path d="M200 540 H1000"/>
+            <path d="M200 580 H1000"/><path d="M200 620 H1000"/><path d="M200 660 H1000"/><path d="M200 700 H1000"/>
+            <path d="M200 740 H1000"/><path d="M200 780 H1000"/><path d="M200 820 H1000"/>
+          </g>
+          <g stroke-width="1.6">
+            <path d="M240 260 V820"/><path d="M290 260 V820"/><path d="M340 260 V820"/><path d="M390 260 V820"/>
+            <path d="M440 260 V820"/><path d="M490 260 V820"/><path d="M540 260 V820"/><path d="M590 260 V820"/>
+            <path d="M640 260 V820"/><path d="M690 260 V820"/><path d="M740 260 V820"/><path d="M790 260 V820"/>
+            <path d="M840 260 V820"/><path d="M890 260 V820"/><path d="M940 260 V820"/><path d="M990 260 V820"/>
+          </g>
+          <!-- 硬边界 -->
+          <path d="M1000 200 V880" stroke-width="8"/>
+          <!-- 越界后戛然而止的几条线 -->
+          <g stroke-width="2.5">
+            <path d="M1000 340 H1120"/><path d="M1000 500 H1180"/><path d="M1000 660 H1090"/>
+          </g>
+          <g fill="#11100f" stroke="none">
+            <rect x="1114" y="334" width="12" height="12"/>
+            <rect x="1174" y="494" width="12" height="12"/>
+            <rect x="1084" y="654" width="12" height="12"/>
+          </g>
+        </svg>
+      </div>
+      <div class="vertical-lockup">
+        <p>Limits</p>
+        <h2><b>边</b><b>界</b></h2>
+      </div>
+      <span class="section-index">05</span>
+    </section>
+
+    <!-- 14 边界正文 -->
+    <section class="frame-slide" aria-label="它不能做什么">
+      <div class="content-frame">
+        <span class="tag top-tab">它不能做什么</span>
+        <div class="columns">
+          <div class="column body-copy">
+            <p class="lead">先把话说死，免得改造改过头。</p>
+            <ul>
+              <li>生成文本、代码、摘要——完全不会，这是设计。</li>
+              <li>给出判断理由——只给概率，不给解释。</li>
+              <li>多步推理——问题之间隔离，天生没有链。</li>
+              <li>开放式抽取——得先出候选，再让它选。</li>
+              <li>图像、音频、视频——当前只吃纯文本。</li>
+              <li>保证判断正确——靠门控兜，不靠模型。</li>
+            </ul>
+          </div>
+          <div class="column body-copy">
+            <p class="lead">「不可能幻觉」要理解准确。</p>
+            <p>它指的是<span class="invert">输出不可能违反 schema</span>、不可能编出你没定义的选项——不是判断一定对。选错依然会发生。</p>
+            <div class="muted-block">还有两件事值得先知道：「快 193 倍」出自厂商自评，官方也标注了那是收益上限；中文场景至今没有任何公开评测，别把英文结论直接搬过来。</div>
+          </div>
+        </div>
+      </div>
+      <div class="chapter-footer"><strong>边 界</strong><span>Limits</span></div>
+    </section>
+
+    <!-- 15 收束 -->
+    <section class="closing" aria-label="收束页">
+      <span class="tag closing-label">Takeaway</span>
+      <h2 style="font-size:104px;line-height:1.25;text-align:center;letter-spacing:.02em;">
+        把选择题交给它<br>把判断权留在你的代码里
+      </h2>
+      <span class="tag author-tag">github.com/yzfly/awesome-jev-zh</span>
+    </section>
+
+  </div>
+</div>
+
+<nav class="deck-controls" aria-label="演示控制">
+  <button class="deck-control" type="button" data-action="prev" aria-label="上一页" title="上一页（←）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+  </button>
+  <span class="slide-count" aria-live="polite">01 / 01</span>
+  <span class="deck-dots" aria-label="页面导航"></span>
+  <button class="deck-control" type="button" data-action="next" aria-label="下一页" title="下一页（→）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+  </button>
+  <button class="deck-control" type="button" data-action="overview" aria-label="打开索引视图" aria-pressed="false" title="索引视图（Esc / O）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+  </button>
+  <button class="deck-control" type="button" data-action="fullscreen" aria-label="进入全屏" aria-pressed="false" title="全屏（F）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>
+  </button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.js"></script>
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const deckReady = Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0,
+    minScale: 0.2,
+    maxScale: 2,
+    hash: true,
+    controls: false,
+    progress: false,
+    center: false,
+    transition: reduceMotion ? 'none' : 'fade',
+    backgroundTransition: reduceMotion ? 'none' : 'fade'
+  });
+
+  deckReady.then(() => {
+    const root = document.querySelector('.deck-controls');
+    const count = root.querySelector('.slide-count');
+    const dots = root.querySelector('.deck-dots');
+    const slides = [...document.querySelectorAll('.reveal .slides > section')];
+    const action = name => root.querySelector(`[data-action="${name}"]`);
+
+    slides.forEach((_, index) => {
+      const dot = document.createElement('button');
+      dot.className = 'deck-dot';
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `跳到第 ${index + 1} 页`);
+      dot.addEventListener('click', () => Reveal.slide(index));
+      dots.appendChild(dot);
+    });
+
+    const update = () => {
+      const current = Reveal.getIndices().h;
+      const routes = Reveal.availableRoutes();
+      count.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      action('prev').disabled = !routes.left;
+      action('next').disabled = !routes.right;
+      dots.querySelectorAll('.deck-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === current);
+        dot.setAttribute('aria-current', index === current ? 'page' : 'false');
+      });
+    };
+
+    action('prev').addEventListener('click', () => Reveal.prev());
+    action('next').addEventListener('click', () => Reveal.next());
+    action('overview').addEventListener('click', () => Reveal.toggleOverview());
+    action('fullscreen').addEventListener('click', async () => {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    });
+
+    Reveal.on('slidechanged', update);
+    Reveal.on('overviewshown', () => action('overview').setAttribute('aria-pressed', 'true'));
+    Reveal.on('overviewhidden', () => action('overview').setAttribute('aria-pressed', 'false'));
+    document.addEventListener('fullscreenchange', () => {
+      const active = Boolean(document.fullscreenElement);
+      action('fullscreen').setAttribute('aria-pressed', String(active));
+      action('fullscreen').setAttribute('aria-label', active ? '退出全屏' : '进入全屏');
+    });
+    if (!document.fullscreenEnabled) action('fullscreen').disabled = true;
+    update();
+  });
+</script>
+</body>
+</html>

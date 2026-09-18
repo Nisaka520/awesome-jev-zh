@@ -13,6 +13,8 @@ TypeSafe 由前 OpenAI 研究员 Diogo Almeida 创办，他是 InstructGPT 论�
 
 这是该生态的中文精选列表，外加两份中文指南。
 
+**先看图**：[**一图读懂 Jev**](https://code.jiangshu.ai/awesome-jev-zh/) —— 15 页极简图解，讲清它是什么、快在哪、怎么用对、证据与边界。
+
 <sub>非官方整理，与 TypeSafe AI 无隶属关系 · 厂商自评数据已标注，见 [冷静看待](#-冷静看待)</sub>
 
 ---
@@ -613,6 +615,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | 文档 | 内容 |
 | :-- | :-- |
 | [**上手指南**](docs/quickstart.md) | 接入路径、三原语讲透、置信度门控怎么定阈值、一个能上线的工单分类器、报错对照 |
+| [**图解说明**](https://code.jiangshu.ai/awesome-jev-zh/) | 15 页幻灯片，一图一个判断，适合转给同事看 |
 | [**概念与心法**](docs/concepts.md) | System One 新在哪、RLCD vs RLHF、为什么问题要原子、校准概率怎么读、LLM 流程改造四步法 |
 
 ---

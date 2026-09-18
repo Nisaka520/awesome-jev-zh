@@ -1,0 +1,4 @@
+# 一行一个 owner/repo，收录器会跳过它们。
+# 用于拉黑同名但与 Jev 无关的项目，或明显灌水/空仓库。
+jevajs/Jeva
+QAInsights/JEval

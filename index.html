@@ -195,7 +195,7 @@
     <section class="cover" aria-label="封面">
       <div class="cover-wrap">
         <h1>一个不说话的模型</h1>
-        <p class="lede">你给它一段文字和几个带类型的问题，<br>它返回代码能直接用的值——不写一个字。</p>
+        <p class="lede">给它一段文字和几个带类型的问题，<br>它返回代码可以直接使用的值——一个字也不生成。</p>
         <span class="tag">Jev · TypeSafe System One</span>
       </div>
       <span class="meta">2026.09.15 发布 · GITHUB.COM/YZFLY/AWESOME-JEV-ZH</span>
@@ -203,12 +203,12 @@
 
     <!-- 02 它是什么 -->
     <section aria-label="它是什么">
-      <div class="head"><span class="tag">01</span><h2>它不是更小更快的 LLM，是另一类东西</h2></div>
+      <div class="head"><span class="tag">01</span><h2>它不是更小更快的 LLM</h2></div>
       <div class="two">
         <div class="note">
-          <p><b>大语言模型</b>：你给它 prompt，它逐 token 生成一串字符串。你再写代码去解析、校验、重试。它可能输出你没定义的东西。</p>
-          <p><b>Jev</b>：你给它一段 state 和一组带类型的问题，它一次并行答完，返回的值本来就在你给的集合里。<span class="invert">没有解析这一步</span>，因为它压根没生成字符串。</p>
-          <p class="sub">TypeSafe 管这类模型叫 System One，取自卡尼曼的「系统一」——快速、直觉的那套思维。训练方法叫 RLCD，优化目标是概率诚实，不是人类偏好。</p>
+          <p><b>大语言模型</b>：给它 prompt，它逐 token 生成一串字符串。你需要再写代码去解析、校验、重试，而且它有可能输出你没定义过的东西。</p>
+          <p><b>Jev</b>：给它一段 state 和一组带类型的问题，它一次并行答完，返回的值本来就落在你给定的集合里。<span class="invert">没有解析这一步</span>，因为它自始至终没有生成字符串。</p>
+          <p class="sub">TypeSafe 把这类模型称为 System One，取自卡尼曼的「系统一」——快速、直觉的那套思维。训练方法叫 RLCD，优化目标是概率诚实，而不是人类偏好。</p>
         </div>
         <div class="fields">
           <div><code>输出</code><span>你给的选项之一 / 一个分数 / 一个 0–1 概率</span></div>
@@ -303,10 +303,10 @@ r = client.system_one(
     },
 )</pre>
         <div class="note">
-          <p><b>criteria 的 key 给代码用，value 给模型看。</b>key 写得像标识符，value 写得像人话，两边都别省。</p>
-          <p><b>Noul 写陈述句，不写问句。</b>写「用户在抱怨」，别写「用户在抱怨吗？」</p>
-          <p><b>Score 的档位要能用眼睛验证。</b>「好 / 中 / 差」会飘，上面那三档才稳。</p>
-          <div class="block">三个问题在同一次请求里对同一份 state 并行求值，彼此看不见对方的答案。</div>
+          <p><b>criteria 的 key 给代码用，value 给模型看。</b>key 写成标识符的样子，value 写成人话，两边都省不掉。</p>
+          <p><b>Noul 写成陈述句。</b>「用户在抱怨」，不是「用户在抱怨吗？」——这一条我改了两遍才记住。</p>
+          <p><b>Score 的档位要能用眼睛验证。</b>「好 / 中 / 差」没有可观测的锚点，结果会飘；上面那三档就稳得多。</p>
+          <div class="block">这三个问题在同一次请求里对同一份 state 并行求值，彼此看不见对方的答案。</div>
         </div>
       </div>
       <div class="foot"><span class="muted">改写自官方 Quick start 示例</span></div>
@@ -340,11 +340,11 @@ r = client.system_one(
   }
 }</pre>
         <div class="fields">
-          <div><code>choice</code><span>一定是你给的三个 key 之一。它<b>没有能力</b>返回第四个值</span></div>
+          <div><code>choice</code><span>一定是你给的三个 key 之一。模型<b>没有能力</b>返回第四个值，这是结构上的保证</span></div>
           <div><code>score</code><span>小数，不是档位序号。1.035 落在「有情绪但讲道理」附近，比三档本身更细</span></div>
           <div><code>noul</code><span>0 到 1 的概率。0.999 = 几乎确定这条有时间压力</span></div>
-          <div><code>confidence</code><span>拿去写 if 的那个数。答案告诉你是什么，它告诉你要不要直接动手</span></div>
-          <div><code>output_tokens</code><span>记了 48，一分钱不收</span></div>
+          <div><code>confidence</code><span>这是你拿去写 if 的那个数。答案告诉你「是什么」，它告诉你「要不要直接动手」</span></div>
+          <div><code>output_tokens</code><span>记录了 48，但不计费</span></div>
         </div>
       </div>
       <div class="foot"><span class="muted">官方 Quick start 的原始响应</span></div>
@@ -352,12 +352,12 @@ r = client.system_one(
 
     <!-- 06 置信度 -->
     <section aria-label="置信度门控">
-      <div class="head"><span class="tag">05</span><h2>上一页那个 0.596，正是不该直接执行的例子</h2></div>
+      <div class="head"><span class="tag">05</span><h2>回到那个 0.596</h2></div>
       <div class="two">
         <div class="note">
-          <p>department 的置信度只有 <b>0.596</b>。这条工单同时提到了扣款和没人理，本来就跨 billing 与 technical 两类——人来判也会犹豫。</p>
-          <p>绝大多数把 Jev 用砸的案例，都是拿着 choice 直接执行，不看 confidence。</p>
-          <div class="block"><b>阈值不能拍脑袋。</b>跑一批你自己的真实数据，按置信度分桶统计准确率。模型宣称是校准的，0.7 那一桶长期就该在 70% 附近——这张表既是在定阈值，也是在验证它在<b>你的数据</b>上到底校不校准。</div>
+          <p>department 的置信度只有 <b>0.596</b>。原因其实很直观：这条工单同时提到了扣款和没人理，本来就跨 billing 与 technical 两类，换成人来判断也会犹豫。</p>
+          <p>我自己第一次用就栽在这里：拿着 choice 直接执行，没看 confidence。这大概是最常见的一种用法错误。</p>
+          <div class="block"><b>阈值是量出来的。</b>拿一批自己的真实数据，按置信度分桶统计准确率。模型宣称是校准的，那么 0.7 那一桶长期就该落在 70% 附近。这张表一举两得：定阈值，同时验证它在<b>你的数据</b>上到底校不校准。</div>
           <p class="sub" style="margin-top:28px !important;">置信度低有两种成因，<code>probabilities</code> 能分辨：</p>
           <ul style="margin-top:8px;">
             <li><b>前两名咬得很紧</b>——这条输入本来就跨两类。该上抛，或者承认你的分类体系有重叠。</li>
@@ -385,7 +385,7 @@ r = client.system_one(
 <i>#   0.6–0.7 → 实际准确率 ?</i>
 <i># 对不上，阈值就是假的</i></pre>
       </div>
-      <div class="foot"><span class="muted">中文场景至今没有公开评测，这一步不能省</span></div>
+      <div class="foot"><span class="muted">中文场景至今没有公开评测，这一步省不掉</span></div>
     </section>
 
     <!-- 07 扇出 -->
@@ -393,10 +393,10 @@ r = client.system_one(
       <div class="head"><span class="tag">06</span><h2>输出免费，所以一次多问几个不花钱</h2></div>
       <div class="two wide-right">
         <div class="note">
-          <p>同一次请求里的问题<b>共享同一份 state</b>，而 state 只按输入计费一次。</p>
-          <p>所以问 1 个问题和问 20 个问题，<b>成本几乎一样</b>。正确用法是反直觉的：把可能用得上的问题一次全问了，在代码里筛。</p>
+          <p>这里有个很实用的性质：同一次请求里的问题<b>共享同一份 state</b>，而 state 只按输入计费一次。</p>
+          <p>所以问 1 个问题和问 20 个问题，<b>成本几乎一样</b>。由此得到一个有点反直觉的用法：把可能用得上的问题一次全问了，再在代码里筛。</p>
           <p class="sub">官方管这叫投机扇出。上限是 64k 上下文，其中 state 加最长的那个问题不超过 32k。</p>
-          <div class="block">顺手把「以前因为太贵所以没问」的问题也加上——这一步经常能白捡新功能。</div>
+          <div class="block">顺手把那些「以前因为太贵所以没问」的问题也加上——这一步常常能白捡到新功能。</div>
         </div>
         <pre class="code sm">r = client.system_one(
     state=ticket,                <i># 只算一次钱</i>
@@ -423,7 +423,7 @@ priority = "P0" <b>if</b> (
 
     <!-- 08 三个原语 -->
     <section aria-label="三个原语">
-      <div class="head"><span class="tag">07</span><h2>问题只有三种，别的都是这三种拼出来的</h2></div>
+      <div class="head"><span class="tag">07</span><h2>问题只有三种，复杂逻辑由它们组合而成</h2></div>
       <table class="cases">
         <thead><tr><th>原语</th><th>问它什么</th><th>返回</th><th>典型用途</th><th>坑</th></tr></thead>
         <tbody>
@@ -450,7 +450,7 @@ priority = "P0" <b>if</b> (
           </tr>
         </tbody>
       </table>
-      <div class="foot"><span class="muted">核心心法一句话：问题尽量原子，组合逻辑写在你自己的代码里</span></div>
+      <div class="foot"><span class="muted">整套东西里最要紧的一句：问题尽量原子，组合逻辑写在自己的代码里</span></div>
     </section>
 
     <!-- 09 同题对比 -->
@@ -497,15 +497,15 @@ conf = r.answers["department"].confidence
 <i># 没有重试分支</i>
 <i># 没有「它编了个不存在的值」</i>
 <i># 有一个能写 if 的 confidence</i></pre>
-          <div class="block" style="margin-top:22px;">代价：它只会做判断。要生成文案、要解释理由、要多步推理，还得用 LLM。</div>
+          <div class="block" style="margin-top:22px;">当然也有代价：它只做判断。需要生成文案、解释理由或多步推理时，仍然要用 LLM。</div>
         </div>
       </div>
-      <div class="foot"><span class="muted">左边那堆重试与校验分支，是这类任务最常见的技术债</span></div>
+      <div class="foot"><span class="muted">左边那些重试与校验分支，是这类任务里最容易被当成理所当然的成本</span></div>
     </section>
 
     <!-- 10 规格 -->
     <section aria-label="规格与定价">
-      <div class="head"><span class="tag">09</span><h2>硬数字</h2></div>
+      <div class="head"><span class="tag">09</span><h2>几个会反复用到的数字</h2></div>
       <div class="stats">
         <div class="stat"><b>0.042<small> / MTok</small></b><span>输入价格，美元</span></div>
         <div class="stat"><b>0<small> / MTok</small></b><span>输出价格，不计费</span></div>
@@ -520,7 +520,7 @@ conf = r.answers["department"].confidence
 
     <!-- 11 别人拿它干了什么 -->
     <section aria-label="真实项目与数字">
-      <div class="head"><span class="tag">10</span><h2>发布一周，别人拿它干了什么</h2></div>
+      <div class="head"><span class="tag">10</span><h2>发布一周，社区已经做出了什么</h2></div>
       <table class="cases">
         <thead><tr><th>项目</th><th>干什么</th><th>实测数字</th></tr></thead>
         <tbody>
@@ -532,7 +532,7 @@ conf = r.answers["department"].confidence
           <tr><td>tamaratran/fast-jev-compaction</td><td>Claude Code 插件：把上下文压缩的「总结」换成逐条判断该不该留</td><td class="n">一周涨到 1.5k 星</td></tr>
         </tbody>
       </table>
-      <div class="foot"><span class="muted">共同点：都把 LLM 从「每一步的决策回路」里摘了出去</span></div>
+      <div class="foot"><span class="muted">它们的共同点：把 LLM 从「每一步的决策回路」里挪了出去</span></div>
     </section>
 
     <!-- 12 证据 -->
@@ -574,15 +574,15 @@ conf = r.answers["department"].confidence
 
     <!-- 13 冷静 -->
     <section aria-label="冷静看待">
-      <div class="head"><span class="tag">12</span><h2>先泼几盆冷水</h2></div>
+      <div class="head"><span class="tag">12</span><h2>几件容易被忽略的事</h2></div>
       <div class="fields" style="font-size:24px;">
-        <div><code>「快 193 倍」</code><span>出自 TypeSafe 自己的 workflow evals，官方也标注了那是<b>收益上限</b>。拿只做分类的模型和要生成完整回答的模型比延迟，本就不对等</span></div>
-        <div><code>正则可能更强</code><span>上一页那份评测里，<b>两行正则规则拿到 91.8%</b>，比 Jev 最好的单信号（89.4%）还高。上新东西之前先跑传统基线</span></div>
-        <div><code>中文零公开数据</code><span>训练语料未公开，中文任务的校准质量<b>至今没有任何公开评测</b>。别把英文结论直接搬到中文工单和审核上</span></div>
-        <div><code>幻觉 ≠ 判断正确</code><span>「不可能幻觉」指的是输出不可能违反 schema、不可能编出你没定义的选项。<b>选错依然会发生</b>，靠置信度门控兜，不靠模型保证</span></div>
-        <div><code>官方公布了毛边</code><span>docs 里有一页 Jev 1.13 jaggedness，列了已知失败模式。值得表扬，也意味着上生产前必须自己跑一遍你的数据</span></div>
+        <div><code>「快 193 倍」</code><span>数据出自 TypeSafe 自己的 workflow evals，官方也标注了那是<b>收益上限</b>。拿只做分类的模型和要生成完整回答的模型比延迟，口径并不对等</span></div>
+        <div><code>传统基线很能打</code><span>上一页那份评测里，<b>两行正则规则拿到 91.8%</b>，高于 Jev 最好的单信号（89.4%）。这个结果挺让人清醒的</span></div>
+        <div><code>中文零公开数据</code><span>训练语料未公开，中文任务的校准质量<b>至今没有任何公开评测</b>。英文结论直接搬到中文工单和内容审核上，风险是未知的</span></div>
+        <div><code>幻觉 ≠ 判断正确</code><span>「不可能幻觉」的准确含义是：输出不可能违反 schema、不可能编出没定义过的选项。这<b>不等于判断一定正确</b>——选错依然会发生，兜底靠置信度门控</span></div>
+        <div><code>官方公布了毛边</code><span>docs 里有一页 Jev 1.13 jaggedness，列出了已知失败模式。厂商主动公开是好事，也说明它在不同任务上表现并不均匀</span></div>
       </div>
-      <div class="foot"><span class="muted">它的稳定优势是成本、延迟与抗分布漂移，不是绝对准确率</span></div>
+      <div class="foot"><span class="muted">它稳定的优势在成本、延迟与抗分布漂移，而不是绝对准确率</span></div>
     </section>
 
     <!-- 14 该用不该用 -->
@@ -590,28 +590,28 @@ conf = r.answers["department"].confidence
       <div class="head"><span class="tag">13</span><h2>什么时候该用，什么时候别用</h2></div>
       <div class="two">
         <div class="note">
-          <p class="sub" style="margin-top:0 !important;">主场</p>
+          <p class="sub" style="margin-top:0 !important;">适合它的场景</p>
           <ul>
             <li>高频、重复、答案空间提前已知的判断</li>
             <li>Agent 的每一步「选哪个元素 / 调哪个工具」</li>
             <li>LLM 的输入输出护栏、内容审核</li>
             <li>无 embedding 的语义检索与重排序</li>
-            <li>上下文剪枝：逐条判断该不该留</li>
+            <li>上下文剪枝：逐条判断哪些内容值得保留</li>
           </ul>
         </div>
         <div class="note">
-          <p class="sub" style="margin-top:0 !important;">别用</p>
+          <p class="sub" style="margin-top:0 !important;">这些场景它帮不上忙</p>
           <ul>
-            <li>要输出文字、代码、摘要——它完全不会</li>
-            <li>要解释理由——它只给概率</li>
-            <li>要多步推理——问题之间隔离，天生没有链</li>
-            <li>开放式抽取——得先出候选，再让它选</li>
-            <li>一天只调几十次——省的钱抵不过多一个供应商</li>
-            <li>窄任务且你有标注数据——先跑传统基线再说</li>
+            <li>需要输出文字、代码、摘要——它没有这个能力</li>
+            <li>需要解释判断理由——它只给概率</li>
+            <li>需要多步推理——问题之间彼此隔离，结构上就没有链</li>
+            <li>开放式抽取——得先用规则出候选，再交给它选</li>
+            <li>一天只调用几十次——省下的成本抵不过多维护一个供应商</li>
+            <li>窄任务且已有标注数据——先跑一遍传统基线再决定</li>
           </ul>
         </div>
       </div>
-      <div class="foot"><span class="muted">一句话：把「其实只是选择题」的调用交给它，剩下的留给 LLM</span></div>
+      <div class="foot"><span class="muted">一个够用的判断标准：本质上是选择题的调用交给它，其余留给 LLM</span></div>
     </section>
 
     <!-- 15 怎么开始 -->
@@ -619,10 +619,10 @@ conf = r.answers["department"].confidence
       <div class="head"><span class="tag">14</span><h2>怎么开始</h2></div>
       <div class="two wide-right">
         <div class="note">
-          <p><b>没拿到 key 也能先写代码。</b>官方出了一个接口完全一致的替身，后端换成普通 LLM API，代码结构先定下来，拿到 key 改一行 import。</p>
-          <p><b>不想排队</b>就走 Vercel AI Gateway，模型 ID typesafe-ai/jev，已官方上线。</p>
-          <p class="sub">OpenRouter 有模型页，但截至本页更新日它的 /api/v1/models 还没列出该模型，调用前自己确认。</p>
-          <div class="block">第一件事不是接入，是<b>跑一遍置信度分桶表</b>。阈值是量出来的，不是拍出来的。</div>
+          <p><b>没拿到 key 也能先动手。</b>官方有一个接口完全一致的替身，后端换成普通 LLM API。代码结构先定下来，拿到 key 之后改一行 import 就切过去了。</p>
+          <p><b>不想排队</b>可以走 Vercel AI Gateway，模型 ID 是 typesafe-ai/jev，已经官方上线。</p>
+          <p class="sub">OpenRouter 有模型页，但截至本页更新日，它的 /api/v1/models 还没列出该模型，调用前自己确认一下。</p>
+          <div class="block">值得先做的不是接入，而是<b>跑一遍置信度分桶表</b>——阈值是量出来的，不是拍出来的。</div>
         </div>
         <pre class="code sm"><i># 1. 没 key，先把代码写起来</i>
 pip install system-one-adapter

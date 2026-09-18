@@ -5,17 +5,17 @@
 [![License](https://img.shields.io/badge/license-CC0--1.0-black.svg?style=flat-square)](LICENSE)
 [![自动收录](https://img.shields.io/badge/热门项目-每日自动收录-black.svg?style=flat-square)](#-热门项目自动榜)
 
-**Jev 不生成文本。一个字都不生成。**
+**Jev 不生成文本。** 第一次看到这句话时我以为是个缺陷，后来才发现这正是它的设计核心。
 
-这不是缺陷，是整个卖点。你给它一段 state 和几个带类型的问题，它在 70–500ms 内一次答完：从你给的选项里选一个、在你给的量表上打一个分、或者一个 0 到 1 的概率。每个答案带一个置信度。输入 $0.042 / MTok，输出不要钱。
+它的用法是：给它一段 state（一封邮件、一行日志、一个工单），再给它几个带类型的问题，它在 70–500ms 内一次性答完——从你给的选项里选一个、在你给的量表上打一个分、或者给出一个 0 到 1 的概率，每个答案都附带一个置信度。输入 $0.042 / MTok，输出不计费。
 
-如果你指望它写个函数、总结一段话、或者跟你解释它为什么这么判断——找错东西了，去用 LLM。
+它的边界也很清楚：要写文案、要总结文章、要解释判断理由，LLM 仍然是更合适的工具。这一条后面还会出现好几次。
 
-那它凭什么值得你多接一个供应商？就一条：**你现在有大把 LLM 调用，其实只是在做选择题。** 拼 prompt、逐 token 生成、剥 markdown fence、`json.loads`、schema 校验、失败重试——绕这么一大圈，就为了拿回 `"billing"` 这一个词。这些代码你我都写过，都知道它有多蠢。Jev 把这一圈砍掉了。
+那它解决了什么？整理这份列表的过程中，我越来越确信一件事：**我们今天写的很多 LLM 调用，本质上只是在做选择题。** 拼 prompt、逐 token 生成、剥掉 markdown 代码块、`json.loads`、校验 schema、失败了再重试——绕这么大一圈，只为了拿回 `"billing"` 这一个词。这段代码我自己写过不止一次。Jev 想省掉的就是这一圈。
 
-先说清楚免得后面吵：**「快 193 倍」是厂商自己测的**，官方还特意标了那是收益上限。有独立评测显示，在钓鱼邮件这个任务上它单问一句只有 62.6%，而两行正则规则有 91.8%。这两个数我都放在 [冷静看待](#-冷静看待) 里，自己看。
+另外有两个数字想先摆出来，免得看完才发现：**「快 193 倍」来自 TypeSafe 自己的评测**，官方也标注了那是收益上限；而独立评测里，在钓鱼邮件这个具体任务上，直接问它一句只有 62.6% 的准确率，两行正则规则能到 91.8%。完整数据在 [冷静看待](#-冷静看待) 一节。
 
-这是它的中文精选列表，外加两份中文指南和一份 [图解说明](https://code.jiangshu.ai/awesome-jev-zh/)。
+这是 Jev 生态的中文精选列表，外加两份中文指南和一份 [图解说明](https://code.jiangshu.ai/awesome-jev-zh/)。
 
 <sub>非官方整理，与 TypeSafe AI 无隶属关系 · Jev 于 2026-09-15 开放 early access · 所有厂商自评数据都标注了出处</sub>
 
@@ -33,7 +33,7 @@
 
 ## 📘 官方资源
 
-文档写得不错，这是实话。想真懂就读这些，别读二手解读（包括我这份）。
+官方文档写得相当清楚。真要弄懂这个模型，这里是最短的路径；二手解读（包括这份列表）只能算补充。
 
 | 资源 | 说明 |
 | :-- | :-- |
@@ -122,7 +122,7 @@ TypeSafe 管这类模型叫 System One，取自卡尼曼的「系统一」，快
 
 ## ⚡ 上手
 
-官方直连要排 waitlist。别等，有不用排队的路：
+官方直连需要排 waitlist，不过不必干等——下面几条路现在就能动手：
 
 | 路径 | 模型 ID | 要不要 waitlist | 适合谁 |
 | :-- | :-- | :-- | :-- |
@@ -164,7 +164,7 @@ response = client.system_one(
 )
 ```
 
-返回长这样。注意 `output_tokens` 记了 48 但一分钱不收，也注意那个 `confidence: 0.596`：
+返回长这样。有两处值得一提：`output_tokens` 记了 48 但不计费；还有那个 `confidence: 0.596`，下面马上会用到。
 
 ```json
 {
@@ -178,9 +178,9 @@ response = client.system_one(
 }
 ```
 
-注意上面那个 `confidence: 0.596`。这是官方文档自己的示例，而 0.596 意味着**这条本来就不该直接路由**——它同时提到扣款和没人理，跨两个组。
+回到那个 `confidence: 0.596`——这是官方文档自己的示例。0.596 其实是在说：**这一条不适合直接路由。** 原因也很直观：这条工单同时提到了扣款和没人理，本来就跨 billing 与 technical 两类，换成人也会犹豫。
 
-拿着 `choice` 直接执行、不看 `confidence`，是把 Jev 用砸的第一大原因。`choice` 告诉你是什么，`confidence` 告诉你要不要动手。展开见 [中文上手指南](docs/quickstart.md)。
+我自己第一次用的时候就栽在这里——拿着 `choice` 直接执行，没看 `confidence`。这两个字段的分工是：`choice` 告诉你是什么，`confidence` 告诉你要不要动手。完整讲解见 [中文上手指南](docs/quickstart.md)。
 
 ```bash
 npm install @typesafe-ai/sdk                           # 官方 JS/TS
@@ -192,7 +192,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 📐 规格与定价
 
-没有营销话术，就是这些数字：
+后面判断「值不值得用」的时候，这几个数字会反复用到：
 
 | 项 | 值 |
 | :-- | :-- |
@@ -206,7 +206,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | 端点 | `POST https://api.typesafe.ai/v1/systemone` |
 | 延迟 | 70–500ms（官方数据） |
 
-「快 N 倍」这种话我一个字都不信，但下面两个数字是实打实的：官方 Doom demo 跑 10 次查询/秒约 **$7/小时**；browser-use 订一张机票全程 **7 秒 / $0.0039**。便宜到你可以对每个 DOM 元素都问一遍——这才是它真正改变的东西。
+比起「快 N 倍」，具体场景的开销更能说明问题：官方 Doom demo 跑 10 次查询/秒约 **$7/小时**；browser-use 订一张机票全程 **7 秒 / $0.0039**。这个价格意味着可以对页面上每一个 DOM 元素都问一遍——真正改变做法的是这一点，而不是某个倍数。
 
 <sub>来源：[Models 文档](https://docs.typesafe.ai/models) · [发布博文](https://typesafe.ai/blog/introducing-system-one-models-and-jev)</sub>
 
@@ -214,7 +214,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🧭 该用与不该用
 
-没有银弹。下面这张表比任何 benchmark 都有用。
+没有哪个模型适合所有场景。跑 benchmark 之前先对照一下这张表，能省不少时间。
 
 | 场景 | | 为什么 |
 | :-- | :-- | :-- |
@@ -233,7 +233,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 📈 热门项目自动榜
 
-机器每天重抓重排，人工精选区它碰不到。规则和去噪逻辑都在 [`collect_hot.py`](scripts/collect_hot.py) 里，嫌它收错了就改 [`denylist.txt`](scripts/denylist.txt)。星数高不代表东西好，这一栏只告诉你大家在往哪跑。
+这一段由脚本每天重抓重排，人工精选区不受影响。收录与去噪逻辑都在 [`collect_hot.py`](scripts/collect_hot.py)，发现误收可以补进 [`denylist.txt`](scripts/denylist.txt)。星数高只说明关注度高，不代表质量好，把它当作「大家在往哪个方向探索」的信号更合适。
 
 <!-- HOT:START -->
 > 🤖 由 [`scripts/collect_hot.py`](scripts/collect_hot.py) 每日自动抓取并排序，最后更新：**2026-09-18**（UTC）。收录规则：2026-09-10 之后创建、名称/描述/README 命中 Jev 生态关键词、Star ≥ 3，外加 [`typesafe-ai`](https://github.com/typesafe-ai) 官方组织全量。`🆕` = 本周新进榜，`▲` = 相比上次抓取的 Star 增量。
@@ -306,7 +306,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🧰 SDK 与客户端
 
-官方两个 SDK 够用了。社区那一堆是给冷门语言的，质量参差，用之前自己看一眼代码。
+多数情况下官方那两个 SDK 就够用。社区版本主要补官方还没覆盖的语言，质量参差不齐，接入前翻一下源码比较稳妥。
 
 ### 官方
 
@@ -340,13 +340,13 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | Python | [**AboveColin/jevclient**](https://github.com/AboveColin/jevclient) | ![](https://badgen.net/github/stars/AboveColin/jevclient) | 非官方异步 Python 客户端 `pip install jevclient` |
 | Rust | [**AbdelStark/s1-rs**](https://github.com/AbdelStark/s1-rs) | ![](https://badgen.net/github/stars/AbdelStark/s1-rs) | derive 宏层：Choice/Score/Noul、类型化问题集、置信度门控、无网络测试 |
 
-> **看清楚包名**：PyPI 上该装的是 `typesafe-sdk`。[`typesafe-ai`](https://pypi.org/project/typesafe-ai/) 是社区抢注的占位包，专门挡蹭名字的恶意包。装错了不怪别人。
+> **包名容易看错**：PyPI 上要装的是 `typesafe-sdk`。[`typesafe-ai`](https://pypi.org/project/typesafe-ai/) 是社区注册的占位包，用来挡蹭名字的恶意包，本身不是官方 SDK。
 
 ---
 
 ## 🛠 应用
 
-把 Jev 放进真实循环里的开源项目。这是整份列表最值得读代码的一栏——别人已经趟过的坑，没必要再趟一遍。
+这些项目已经把 Jev 放进了真实的循环里。整份列表我自己读得最久的就是这一栏——别人踩过的坑，可以直接绕开。
 
 | 项目 | Star | 说明 |
 | :-- | :-- | :-- |
@@ -379,7 +379,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🎮 Demo
 
-发布 48 小时内涌出来的玩具。看十页文档不如自己跑一个——点开两三个，五分钟就知道它能干什么、不能干什么。
+发布 48 小时内涌现出来的小玩具。我是挑了两三个跑完之后，才真正对它的能力边界有了感觉——比读十页文档快得多。
 
 | 项目 | Star / 链接 | 说明 |
 | :-- | :-- | :-- |
@@ -407,7 +407,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🤖 Agent 工具
 
-把 Jev 接进 Claude Code、Codex、Cursor、MCP 的工具。这块出得最快，因为编程 Agent 每一步都在做选择题——路由、选技能、判断工具结果该不该留，全是它的活。
+把 Jev 接进 Claude Code、Codex、Cursor、MCP 的工具。这个方向的项目出得最快，原因也不难理解：编程 Agent 的每一步——路由到哪个模型、加载哪个技能、这条工具结果该不该留在上下文里——本质上都是选择题。
 
 | 项目 | Star | 说明 |
 | :-- | :-- | :-- |
@@ -439,7 +439,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🔬 复现与评测
 
-受 Jev 接口启发的独立工作。**都不是 TypeSafe 的模型**，别搞混。想知道它到底怎么做到的，读这些比读官方博文有用。
+这些是受 Jev 接口启发的独立工作，**都不是 TypeSafe 的模型**。想弄明白它在技术上怎么做到的，这些复现比官方博文讲得清楚。
 
 ### 开源复现
 
@@ -476,13 +476,13 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | [**teyhouse/jev-secret-detection**](https://github.com/teyhouse/jev-secret-detection) | ![](https://badgen.net/github/stars/teyhouse/jev-secret-detection) | 测量 Jev 在代码片段里识别真实密钥凭证的能力 |
 | [**jmanhype/jev-dspy-lab**](https://github.com/jmanhype/jev-dspy-lab) | ![](https://badgen.net/github/stars/jmanhype/jev-dspy-lab) | DSPy 配套评测：录制并重放调用，测校准、选择性风险、置信度弃权、延迟、成本 |
 
-> **中文场景至今零公开评测。** 你要是跑过中文分类 / 审核 / 工单的对比测试，把数据发过来——不管结论对 Jev 有利还是不利。这是这份列表最缺的东西。
+> **中文场景至今没有公开评测。** 谁做过中文分类、内容审核或客服工单的对比测试，欢迎把数据发过来——结论对 Jev 有利还是不利都一样有价值。这是这份列表目前最缺的一块。
 
 ---
 
 ## 🍳 Cookbook 与模式
 
-官方写好的、能直接抄的工作流。四个核心模式看完，你就知道这东西该怎么架了。
+官方整理好的、可以直接照着改的工作流。下面四个核心模式是骨架，读完基本就知道系统该怎么搭了。
 
 | 模式 | 一句话 |
 | :-- | :-- |
@@ -522,7 +522,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 📰 文章
 
-媒体报道基本是同一份新闻稿的不同排列，挑一篇看就够。下面「技术走读」那栏才值得读。
+媒体报道大多基于同一份发布稿，挑一篇看背景就够。下面的「技术走读」信息量大得多。
 
 ### 媒体报道
 
@@ -555,7 +555,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | [TypeSafeのJevを正しく驚く、それってLLMでできませんか？](https://zenn.dev/nwn/articles/824026c76116e0) | Jev 是什么、不是什么，边界画得很准 |
 | [jev 同士に五目並べで対戦させた](https://zenn.dev/mizchi/articles/jev-plays-gomoku) | mizchi 让两个 Jev 下五子棋，带源码和耗时日志 |
 
-> 中文一手内容几乎是空白，[docs/](docs/) 就是为填这个坑写的。写了中文实践文章的，提 PR。
+> 中文一手内容目前几乎是空白，[docs/](docs/) 就是为了补这一块。写了中文实践文章的话，欢迎提 PR 进来。
 
 ---
 
@@ -595,19 +595,19 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🧊 冷静看待
 
-生态才几天大，吹的人比验证的人多得多。下面五条在你写第一行代码之前就该知道。
+这个生态才几天大，讨论的热度远远跑在验证的前面。下面五点是我整理这份列表时反复撞到的，放在这里供参考。
 
 | | |
 | :-- | :-- |
-| **「快 193 倍」是厂商自评** | 出自 TypeSafe 自己的 [workflow evals](https://evals.typesafe.ai)，官方还特意标了那是收益上限。[HN 讨论](https://news.ycombinator.com/item?id=49717558)的质疑很直接：拿一个只会做分类的模型去和要生成完整回答的模型比延迟，这比较本身就不成立 |
-| **官方公布了能力毛边** | [Jev 1.13 jaggedness](https://docs.typesafe.ai/model-jaggedness/jev-1.13) 列了已知失败模式。这点值得表扬，也意味着上生产前必须自己跑一遍你的数据 |
-| **中文场景零公开数据** | 训练语料没公开，中文任务的校准质量没有任何公开评测。英文的结论一条都别往中文工单和审核上搬 |
-| **「不可能幻觉」有边界** | 指输出不可能违反 schema、不可能编出不存在的选项，**不是判断一定对**。选错依然会发生，靠置信度门控兜，不靠模型保证 |
-| **早期生态风险** | 单一新供应商、配额不稳、API 随版本变。降级方案现在就写好，别等出事（官方 [adapter](https://github.com/typesafe-ai/system-one-adapter-python) 就是干这个用的） |
+| **「快 193 倍」是厂商自评** | 数据出自 TypeSafe 自己的 [workflow evals](https://evals.typesafe.ai)，官方也标注了那是收益上限。[HN 讨论](https://news.ycombinator.com/item?id=49717558)里提出的质疑值得重视：拿一个只做分类的模型和一个要生成完整回答的模型比延迟，口径本身并不对等 |
+| **官方公布了能力毛边** | [Jev 1.13 jaggedness](https://docs.typesafe.ai/model-jaggedness/jev-1.13) 列出了已知的失败模式。厂商愿意主动公开这些是好事，同时也说明一件事：它在不同任务上的表现并不均匀，上生产前用自己的数据跑一遍不算多余 |
+| **中文场景零公开数据** | 训练语料未公开，中文任务的校准质量也还没有任何公开评测。英文场景的结论直接迁移到中文工单和内容审核上，风险是未知的 |
+| **「不可能幻觉」有边界** | 它的准确含义是：输出不可能违反 schema、不可能编出你没定义的选项。这**不等于判断一定正确**——选错依然会发生，兜底要靠你的置信度门控，而不是模型本身的保证 |
+| **早期生态风险** | 依赖单一新供应商、配额不稳定、API 可能随版本变化。官方的 [adapter](https://github.com/typesafe-ai/system-one-adapter-python) 可以当降级方案用，一开始就接上成本很低 |
 
-### 两份值得你花十分钟读完的独立评测
+### 两份独立评测，十分钟能读完
 
-[**jev-phishing-bench**](https://github.com/anisselbd/jev-phishing-bench)（2000 封钓鱼邮件）是目前最严谨的一份，结论对 Jev 不利也有利：
+[**jev-phishing-bench**](https://github.com/anisselbd/jev-phishing-bench)（2000 封钓鱼邮件）是目前最严谨的一份。结论对 Jev 有不利的一面，也有有利的一面：
 
 | 用法 | 准确率 |
 | :-- | :-- |
@@ -616,21 +616,21 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | 两行正则规则 | 91.8% |
 | **同一次调用拆成 5 个信号 + 代码里做回归** | **95.0%** |
 
-同样的分解便宜约 27 倍、延迟 239ms vs 687ms；但把这 5 个问题照样问 Haiku，回归后 93.2%，与 Jev 统计上打平。
+同样的分解，Jev 便宜约 27 倍，延迟 239ms 对 687ms。作者还补了一组对照：把这 5 个问题原样拿去问 Haiku，回归后能到 93.2%，与 Jev 在统计上没有显著差异。这组对照让整份评测的可信度高了不少。
 
-[**jev-spam-eval**](https://github.com/bitnovus/jev-spam-eval)（18,514 封邮件）给出有利的一面：一段写出来的垃圾邮件定义拿到 98.3%，与用 ~14,800 条标注训练的 TF-IDF（98.4%）打平；换到 2026 年的新邮件，Jev 仍有 97.3%，TF-IDF 掉到 72.5%——**抗分布漂移是它的真实优势**。
+[**jev-spam-eval**](https://github.com/bitnovus/jev-spam-eval)（18,514 封邮件）展示了它擅长的一面：仅凭一段写出来的垃圾邮件定义就拿到 98.3%，和用约 14,800 条标注训练出的 TF-IDF（98.4%）基本持平。更有意思的是分布漂移那一组——换到 2026 年的新邮件，Jev 仍有 97.3%，TF-IDF 掉到 72.5%。**抗分布漂移，大概才是它真正稳定的优势。**
 
-**三条直接拿走：**
+**这两份评测让我改变了三个原本的想法：**
 
-1. **别把它当万能判断器去问复合问题。** 那是它最弱的用法，62.6% 就是这么来的。
-2. **拆成原子信号，组合逻辑写你自己的代码里。** 同一个模型、同一批数据、同一次调用，62.6% → 95.0%。这就是[组合打分模式](https://docs.typesafe.ai/patterns/composite-scoring)在说的事。
-3. **上之前先跑传统基线。** 正则和 TF-IDF 没死。它的稳定优势是成本、延迟和抗分布漂移，不是绝对准确率。谁跟你说它哪儿都更准，让他把数据拿出来。
+1. **它不是万能判断器。** 单问一个复合问题是它最弱的用法，62.6% 就是这么来的——我原本以为「问题写清楚就行」，显然不是。
+2. **拆成原子信号、组合逻辑留在自己代码里，差别比想象中大得多。** 同一个模型、同一批数据、同一次调用，62.6% 到 95.0%。[组合打分模式](https://docs.typesafe.ai/patterns/composite-scoring)讲的就是这件事，看数据之前我没当回事。
+3. **传统基线依然很能打。** 两行正则 91.8% 这个结果挺让人清醒的。Jev 稳定的优势在成本、延迟和抗分布漂移，不在绝对准确率——谁要是说它在所有任务上都更准，问一句数据在哪儿是合理的。
 
 ---
 
 ## 📖 中文指南
 
-英文资料够多了。这两份只写中文世界缺的那部分：不讲故事，只讲怎么写代码、怎么定阈值。
+英文资料已经相当丰富，所以这两份只补中文世界缺的那一块：怎么写第一段代码，以及怎么用自己的数据把阈值量出来。
 
 | 文档 | 内容 |
 | :-- | :-- |
@@ -642,9 +642,9 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## 🤝 贡献
 
-规则很短：**项目真的基于 Jev、链接能打开、一句中文说清它干什么。** 精选表按 Star 降序，新条目插对位置，拿不准就跑 `scripts/sort_tables.py`。
+欢迎 PR。三条约定：**项目确实基于 Jev、链接可以打开、用一句中文说清它做什么。** 精选表按 Star 降序，新条目插到对应位置；拿不准就跑一下 `scripts/sort_tables.py`。
 
-不收空仓库、不收纯 API 中转、不收只有 landing page 没有代码的东西。别浪费大家时间。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+暂不收录空仓库、纯 API 中转服务，以及只有 landing page、没有可读代码的项目。细则见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 许可
 
@@ -654,7 +654,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 <div align="center">
 
-有用就 Star，没用就关掉
+这份列表如果帮上忙了，欢迎点个 Star
 
 由 [云中江树](https://github.com/yzfly) 维护 · 微信公众号「云中江树」
 

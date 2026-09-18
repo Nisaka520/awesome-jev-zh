@@ -62,7 +62,7 @@ RLHF 有个众所周知的副作用：**偏好对齐会破坏校准。** 一个�
 
 TypeSafe 的立场（见 [AI: too good to be true, too bad to be useful](https://typesafe.ai/blog/ai-too-good-to-be-true-too-bad-to-be-useful-typesafe-ai)）就是：**自动化流程不该用偏好对齐过的聊天模型**。RLCD 直接把「概率诚实」作为优化目标，换来的就是那个可以拿来写 `if` 的 `confidence`。
 
-> ⚠️ 这是厂商的技术主张。RLCD 目前没有公开论文，校准质量在你自己的数据上究竟如何，**必须自己量**——[上手指南第三节](quickstart.md#三置信度门控用对-jev-的分水岭)的分桶表就是干这个的。
+> ⚠️ 这是厂商的技术主张。RLCD 目前没有公开论文，校准质量在自己的数据上究竟如何，**只能自己量**——[上手指南第三节](quickstart.md#三置信度门控用对-jev-的分水岭)的分桶表就是干这个的。
 
 ---
 

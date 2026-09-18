@@ -168,6 +168,17 @@
     .diagram-title { margin-top: 10px !important; font-size: 56px; font-weight: 700; text-align: center; }
     .diagram-note { margin-top: 16px !important; font-size: 22px; text-align: center; color: var(--muted); }
 
+    /* 收束页 */
+    .closing { display: grid !important; place-items: center; }
+    .closing h2 {
+      font-size: 104px;
+      font-weight: 700;
+      line-height: 1.26;
+      letter-spacing: .02em;
+      text-align: center;
+    }
+    .closing-label { position: absolute; left: 50%; top: 168px; transform: translateX(-50%); }
+
     /* 数字页 */
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 0; row-gap: 62px; margin-top: 96px; }
     .stat { padding: 0 44px; border-left: 1px solid var(--line); }
@@ -663,9 +674,7 @@
     <!-- 15 收束 -->
     <section class="closing" aria-label="收束页">
       <span class="tag closing-label">Takeaway</span>
-      <h2 style="font-size:104px;line-height:1.25;text-align:center;letter-spacing:.02em;">
-        把选择题交给它<br>把判断权留在你的代码里
-      </h2>
+      <h2>把选择题交给它<br>把判断权留在你的代码里</h2>
       <span class="tag author-tag">github.com/yzfly/awesome-jev-zh</span>
     </section>
 

@@ -22,7 +22,7 @@
 
 ## 格式要求
 
-人工精选区的每一行都是表格，格式：
+人工精选区的每一行都是表格，**按 Star 从高到低排列**，格式：
 
 ```markdown
 | [**owner/repo**](https://github.com/owner/repo) | ![](https://badgen.net/github/stars/owner/repo) | 一句话中文说明，讲清楚它用 Jev 干什么、有什么特别的数字 |
@@ -46,11 +46,19 @@
 GITHUB_TOKEN=$(gh auth token) python3 scripts/collect_hot.py --dry-run
 ```
 
+## 关于排序
+
+精选表按 Star 降序。新条目插对位置即可；拿不准就跑一下，它会把所有表重排好：
+
+```bash
+GITHUB_TOKEN=$(gh auth token) python3 scripts/sort_tables.py
+```
+
 ## 提交前自查
 
 - [ ] 链接都能打开（`curl -o /dev/null -w "%{http_code}" <url>` 返回 200）
 - [ ] 中文说明一句话讲清楚了「它用 Jev 干什么」
-- [ ] 放在了正确的分类下
+- [ ] 放在了正确的分类下，且表内位置符合 Star 降序
 - [ ] 没有动 `<!-- HOT:START -->` 和 `<!-- HOT:END -->` 之间的内容
 
 ## 许可

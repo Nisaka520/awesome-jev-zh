@@ -227,11 +227,11 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 
 | # | 项目 | Star | 变化 | 语言 | 一句话 |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| 1 | [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) `🆕` | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | — | Python | i. am. speed. |
-| 2 | [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) `🆕` | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | — | TS | Claude Code plugin that replaces the compaction summary with Jev decisions: every tool call and… |
-| 3 | [**TheoLeeCJ/openjev**](https://github.com/TheoLeeCJ/openjev) `🆕` | ![](https://badgen.net/github/stars/TheoLeeCJ/openjev) | — | Python | Can we run something like Jev on a 3090 at home? |
+| 1 | [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) `🆕` | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | ▲ 7 | Python | i. am. speed. |
+| 2 | [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) `🆕` | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | ▲ 5 | TS | Claude Code plugin that replaces the compaction summary with Jev decisions: every tool call and… |
+| 3 | [**TheoLeeCJ/openjev**](https://github.com/TheoLeeCJ/openjev) `🆕` | ![](https://badgen.net/github/stars/TheoLeeCJ/openjev) | ▲ 2 | Python | Can we run something like Jev on a 3090 at home? |
 | 4 | [**vinnylarouge/jevlike**](https://github.com/vinnylarouge/jevlike) `🆕` | ![](https://badgen.net/github/stars/vinnylarouge/jevlike) | — | Python | — |
-| 5 | [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) `🆕` | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | — | TS | One AI trade decision every Monad block. Jev on Kuru MON-USDC. |
+| 5 | [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) `🆕` | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | ▲ 1 | TS | One AI trade decision every Monad block. Jev on Kuru MON-USDC. |
 | 6 | [**fhshaik/typesafe-mario**](https://github.com/fhshaik/typesafe-mario) `🆕` | ![](https://badgen.net/github/stars/fhshaik/typesafe-mario) | — | Python | A TypeSafe/Jev agent that plays Super Mario Bros. from structured emulator state. |
 | 7 | [**thruwire/foreman**](https://github.com/thruwire/foreman) `🆕` | ![](https://badgen.net/github/stars/thruwire/foreman) | — | Python | Software Factory Foreman based on TypeSafe Jev model |
 | 8 | [**devagrawal09/jev-review**](https://github.com/devagrawal09/jev-review) `🆕` | ![](https://badgen.net/github/stars/devagrawal09/jev-review) | — | TS | A staged code-review workflow and local dashboard built with TypeSafe Jev. |
@@ -253,8 +253,8 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 | 24 | [**RomanSlack/jev-drone**](https://github.com/RomanSlack/jev-drone) `🆕` | ![](https://badgen.net/github/stars/RomanSlack/jev-drone) | — | Python | Camera-only autonomous drone in MuJoCo with a small judgment model (TypeSafe Jev) in the loop a… |
 | 25 | [**jkudish/jev-mcp**](https://github.com/jkudish/jev-mcp) `🆕` | ![](https://badgen.net/github/stars/jkudish/jev-mcp) | — | TS | Proof of concept MCP for Typesafe's new Jev AI model |
 | 26 | [**kitze/unclutter**](https://github.com/kitze/unclutter) `🆕` | ![](https://badgen.net/github/stars/kitze/unclutter) | — | TS | WXT browser extension: Jev-powered page clutter removal with reusable template rules. |
-| 27 | [**dabit3/jev-experiments**](https://github.com/dabit3/jev-experiments) `🆕` | ![](https://badgen.net/github/stars/dabit3/jev-experiments) | — | TS | — |
-| 28 | [**pithings/advocaat**](https://github.com/pithings/advocaat) `🆕` | ![](https://badgen.net/github/stars/pithings/advocaat) | — | TS | A small, type-safe client for asking AI questions about your data, powered by TypeSafe Jev. |
+| 27 | [**dabit3/jev-experiments**](https://github.com/dabit3/jev-experiments) `🆕` | ![](https://badgen.net/github/stars/dabit3/jev-experiments) | ▲ 1 | TS | — |
+| 28 | [**pithings/advocaat**](https://github.com/pithings/advocaat) `🆕` | ![](https://badgen.net/github/stars/pithings/advocaat) | ▲ 1 | TS | A small, type-safe client for asking AI questions about your data, powered by TypeSafe Jev. |
 | 29 | [**hr98w/jev-visual**](https://github.com/hr98w/jev-visual) `🆕` | ![](https://badgen.net/github/stars/hr98w/jev-visual) | — | Python | An educational Jev-like visual inference experiment on Apple Silicon: shared context, direct ca… |
 | 30 | [**DevMortimer/pi-warden**](https://github.com/DevMortimer/pi-warden) `🆕` | ![](https://badgen.net/github/stars/DevMortimer/pi-warden) | — | TS | Guardrails for Pi built on pi-typesafe that steer the agent instead of interrupting you: Jev ju… |
 | 31 | [**TianyuCodings/NanoJev**](https://github.com/TianyuCodings/NanoJev) `🆕` | ![](https://badgen.net/github/stars/TianyuCodings/NanoJev) | — | Python | A nano replica of Jev: parallel decisions, dynamic candidates, and an end-to-end training pipel… |
@@ -276,8 +276,8 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 | 47 | [**shantanugoel/ask-jev-skill**](https://github.com/shantanugoel/ask-jev-skill) `🆕` | ![](https://badgen.net/github/stars/shantanugoel/ask-jev-skill) | — | Python | Skill for Hermes, and other agents, to ask typesafe's jev |
 | 48 | [**brainstormity/Jev-Moderation-Bot**](https://github.com/brainstormity/Jev-Moderation-Bot) `🆕` | ![](https://badgen.net/github/stars/brainstormity/Jev-Moderation-Bot) | — | Python | — |
 | 49 | [**hellogumbo/awesome-jev**](https://github.com/hellogumbo/awesome-jev) `🆕` | ![](https://badgen.net/github/stars/hellogumbo/awesome-jev) | — | HTML | A community directory of projects built on Jev, TypeSafe AI's System One model. |
-| 50 | [**bnsd55/jevmlx**](https://github.com/bnsd55/jevmlx) `🆕` | ![](https://badgen.net/github/stars/bnsd55/jevmlx) | — | Python | Jev-style parallel constrained decisions for any MLX model on Apple Silicon. Typed, schema-vali… |
-| 51 | [**sorrycc/typesafe-snake**](https://github.com/sorrycc/typesafe-snake) `🆕` | ![](https://badgen.net/github/stars/sorrycc/typesafe-snake) | — | TS | Snake auto-played by TypeSafe's Jev model: one System One choice per tick, legal moves and fact… |
+| 50 | [**sorrycc/typesafe-snake**](https://github.com/sorrycc/typesafe-snake) `🆕` | ![](https://badgen.net/github/stars/sorrycc/typesafe-snake) | ▲ 1 | TS | Snake auto-played by TypeSafe's Jev model: one System One choice per tick, legal moves and fact… |
+| 51 | [**bnsd55/jevmlx**](https://github.com/bnsd55/jevmlx) `🆕` | ![](https://badgen.net/github/stars/bnsd55/jevmlx) | — | Python | Jev-style parallel constrained decisions for any MLX model on Apple Silicon. Typed, schema-vali… |
 | 52 | [**0xNatoshi/jev-codex-router**](https://github.com/0xNatoshi/jev-codex-router) `🆕` | ![](https://badgen.net/github/stars/0xNatoshi/jev-codex-router) | — | Python | Per-turn model & reasoning routing for Codex, driven by Jev (TypeSafe System One): picks the mo… |
 | 53 | [**ellipsis-dev/blink**](https://github.com/ellipsis-dev/blink) `🆕` | ![](https://badgen.net/github/stars/ellipsis-dev/blink) | — | TS | Codebase search powered by Jev from @typesafe-ai |
 | 54 | [**rorshopping/jev-on-a-laptop**](https://github.com/rorshopping/jev-on-a-laptop) `🆕` | ![](https://badgen.net/github/stars/rorshopping/jev-on-a-laptop) | — | Python | Unofficial study: Jev-style parallel typed decisions on stock 1.5B-8B models on an Apple Silico… |

@@ -2,15 +2,15 @@
   "updated": "2026-09-18",
   "repos": {
     "browser-use/jev-ultrafast": {
-      "stars": 3088,
+      "stars": 3095,
       "first_seen": "2026-09-18"
     },
     "tamaratran/fast-jev-compaction": {
-      "stars": 1415,
+      "stars": 1420,
       "first_seen": "2026-09-18"
     },
     "TheoLeeCJ/openjev": {
-      "stars": 1021,
+      "stars": 1023,
       "first_seen": "2026-09-18"
     },
     "vinnylarouge/jevlike": {
@@ -18,7 +18,7 @@
       "first_seen": "2026-09-18"
     },
     "jarrodwatts/jev-trader": {
-      "stars": 616,
+      "stars": 617,
       "first_seen": "2026-09-18"
     },
     "fhshaik/typesafe-mario": {
@@ -90,11 +90,11 @@
       "first_seen": "2026-09-18"
     },
     "dabit3/jev-experiments": {
-      "stars": 52,
+      "stars": 53,
       "first_seen": "2026-09-18"
     },
     "pithings/advocaat": {
-      "stars": 52,
+      "stars": 53,
       "first_seen": "2026-09-18"
     },
     "hr98w/jev-visual": {
@@ -169,16 +169,16 @@
       "stars": 18,
       "first_seen": "2026-09-18"
     },
+    "sorrycc/typesafe-snake": {
+      "stars": 16,
+      "first_seen": "2026-09-18"
+    },
     "hellogumbo/awesome-jev": {
       "stars": 16,
       "first_seen": "2026-09-18"
     },
     "brainstormity/Jev-Moderation-Bot": {
       "stars": 16,
-      "first_seen": "2026-09-18"
-    },
-    "sorrycc/typesafe-snake": {
-      "stars": 15,
       "first_seen": "2026-09-18"
     },
     "bnsd55/jevmlx": {
@@ -325,11 +325,11 @@
       "stars": 4,
       "first_seen": "2026-09-18"
     },
-    "y0usaf/typesafe-cli": {
+    "y0usaf/jev-lm": {
       "stars": 4,
       "first_seen": "2026-09-18"
     },
-    "y0usaf/jev-lm": {
+    "y0usaf/typesafe-cli": {
       "stars": 4,
       "first_seen": "2026-09-18"
     },
@@ -377,23 +377,19 @@
       "stars": 3,
       "first_seen": "2026-09-18"
     },
-    "GodsBoy/jev-agent-skill-router": {
-      "stars": 3,
-      "first_seen": "2026-09-18"
-    },
     "vinilana/live-jev": {
       "stars": 3,
       "first_seen": "2026-09-18"
     },
-    "mithalouni/system-one-open": {
-      "stars": 3,
-      "first_seen": "2026-09-18"
-    },
-    "superagents-lab/jev-search": {
+    "GodsBoy/jev-agent-skill-router": {
       "stars": 3,
       "first_seen": "2026-09-18"
     },
     "adhyaay-karnwal/jev-chat": {
+      "stars": 3,
+      "first_seen": "2026-09-18"
+    },
+    "superagents-lab/jev-search": {
       "stars": 3,
       "first_seen": "2026-09-18"
     },
@@ -402,6 +398,10 @@
       "first_seen": "2026-09-18"
     },
     "emrickgarrett/OneVOneJev": {
+      "stars": 3,
+      "first_seen": "2026-09-18"
+    },
+    "mithalouni/system-one-open": {
       "stars": 3,
       "first_seen": "2026-09-18"
     },

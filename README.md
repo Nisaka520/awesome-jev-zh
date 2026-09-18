@@ -49,8 +49,8 @@
 - [🔬 开源复现与独立评测](#-开源复现与独立评测)
 - [🍳 官方 Cookbook 与架构模式](#-官方-cookbook-与架构模式)
 - [📰 深度文章与解读](#-深度文章与解读)
-- [🗣️ 社区与信息源](#️-社区与信息源)
-- [⚠️ 冷静看待：争议与已知毛边](#-冷静看待争议与已知毛边)
+- [💬 社区与信息源](#-社区与信息源)
+- [🧊 冷静看待：争议与已知毛边](#-冷静看待争议与已知毛边)
 - [📚 中文深度指南](#-中文深度指南)
 - [🤝 贡献](#-贡献)
 
@@ -387,7 +387,6 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 | [**AboveColin/HA-Jev**](https://github.com/AboveColin/HA-Jev) | ![](https://badgen.net/github/stars/AboveColin/HA-Jev) | Home Assistant 集成：把「关于家里状态的类型化提问」变成传感器与自动化动作，带每日 token 预算实体 |
 | [**reachjalil/jevlogs**](https://github.com/reachjalil/jevlogs) | ![](https://badgen.net/github/stars/reachjalil/jevlogs) | OpenTelemetry 日志分流：先让 Jev 打诊断价值和优先级，再决定要不要花钱叫 LLM |
 | [**devanshbatham/commit-miner**](https://github.com/devanshbatham/commit-miner) | ![](https://badgen.net/github/stars/devanshbatham/commit-miner) | Rust CLI，给 commit diff 分类：修 bug、安全/CWE、变更类型，出 HTML/CSV 报告 |
-| [**teyhouse/jev-secret-detection**](https://github.com/teyhouse/jev-secret-detection) | ![](https://badgen.net/github/stars/teyhouse/jev-secret-detection) | 用 Jev 扫 diff 里的密钥，结果可复现 |
 | [**lakeday-org/perch**](https://github.com/lakeday-org/perch) | ![](https://badgen.net/github/stars/lakeday-org/perch) | AST 驱动的语义 code lint |
 | [**asfarsadewa/human-compiler**](https://github.com/asfarsadewa/human-compiler) | ![](https://badgen.net/github/stars/asfarsadewa/human-compiler) | 粘贴职场废话，Jev 给「被动攻击 / 紧急感 / 信息密度」打分，代码按 rustc 风格报诊断。在线：[human-compiler.asfarlab.fun](https://human-compiler.asfarlab.fun) |
 | [**santos-sanz/jev-audio-beeper**](https://github.com/santos-sanz/jev-audio-beeper) | ![](https://badgen.net/github/stars/santos-sanz/jev-audio-beeper) | 低延迟脏话检测：Jev 判定后 ffmpeg 在约 466ms 内叠一声 beep |
@@ -484,8 +483,9 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 
 | 项目 | Star | 结论摘要 |
 | :-- | :-- | :-- |
-| [**anisselbd/jev-phishing-bench**](https://github.com/anisselbd/jev-phishing-bench) | ![](https://badgen.net/github/stars/anisselbd/jev-phishing-bench) | 2000 封邮件测钓鱼判断，对比 Claude Haiku 4.5。**这一项准确率是 Haiku 更高**，Jev 赢在延迟和成本 |
-| [**bitnovus/jev-spam-eval**](https://github.com/bitnovus/jev-spam-eval) | ![](https://badgen.net/github/stars/bitnovus/jev-spam-eval) | 零样本垃圾邮件研究，对照训练过的 TF-IDF 基线，作者自己标注了事后调参的 caveat |
+| [**anisselbd/jev-phishing-bench**](https://github.com/anisselbd/jev-phishing-bench) | ![](https://badgen.net/github/stars/anisselbd/jev-phishing-bench) | 🥇 **全生态最严谨的一份评测**。2000 封钓鱼邮件对比 Claude Haiku 4.5：Jev 直接问「该不该点」只有 **62.6%** 准确率（Haiku 81.3%），但**同一次调用里拆成 5 个信号问题、再做逻辑回归就到 95.0%**。作者还在被质疑后补了三组对照（非 AI 正则基线 91.8%、样本切分、同样问题问 LLM）。延迟 239ms vs 687ms，成本 $0.038 vs $0.462 / 千封 |
+| [**bitnovus/jev-spam-eval**](https://github.com/bitnovus/jev-spam-eval) | ![](https://badgen.net/github/stars/bitnovus/jev-spam-eval) | 18,514 封邮件：一段**写出来的**垃圾邮件定义拿到 **98.3%**，和用 ~14,800 条标注训练的 TF-IDF（98.4%）打平，两者平均后 **99.2%**。**最关键的是分布漂移**——换到 2026 年的新邮件，同一个问题仍有 97.3%，TF-IDF 掉到 72.5%。作者自己标注了「判据是看过错误样本后写的」这一 caveat |
+| [**teyhouse/jev-secret-detection**](https://github.com/teyhouse/jev-secret-detection) | ![](https://badgen.net/github/stars/teyhouse/jev-secret-detection) | 测量 Jev 在代码片段里识别真实密钥凭证的能力 |
 | [**anessbelbati/jev-rerank-bench**](https://github.com/anessbelbati/jev-rerank-bench) | ![](https://badgen.net/github/stars/anessbelbati/jev-rerank-bench) | 重排序对比：原始 provider 响应、打分代码、不确定区间、写明的局限 |
 | [**Gaurav-Gosain/jev-sec-bench**](https://github.com/Gaurav-Gosain/jev-sec-bench) | ![](https://badgen.net/github/stars/Gaurav-Gosain/jev-sec-bench) | 公开语料盲测：提示注入与漏洞代码检测 |
 | [**TokenTrim/jev-agent-failure-benchmark**](https://github.com/TokenTrim/jev-agent-failure-benchmark) | ![](https://badgen.net/github/stars/TokenTrim/jev-agent-failure-benchmark) | Who&When Pro（注入的 Agent 故障）：预测是谁 / 哪一步 / 哪类错误 |
@@ -573,7 +573,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 
 ---
 
-## 🗣️ 社区与信息源
+## 💬 社区与信息源
 
 | 渠道 | 说明 |
 | :-- | :-- |
@@ -607,13 +607,28 @@ npx skills add typesafe-ai/skills --skill typesafe-ai     # 其他 Agent
 
 ---
 
-## ⚠️ 冷静看待：争议与已知毛边
+## 🧊 冷静看待：争议与已知毛边
 
 这一栏是刻意留的。生态太新，鼓吹的声音远多于验证的声音。
 
 **1. 「快 193 倍、便宜 444 倍」是厂商自评。** 这个数字出自 TypeSafe 自己的 [workflow evals](https://evals.typesafe.ai)，且官方自己标注了是「真实收益的上限」。Hacker News [讨论区](https://news.ycombinator.com/item?id=49717558)的主要质疑就是这个比较口径——拿一个只做分类的模型和一个要生成完整回答的模型比延迟，本身不完全对等。
 
-**2. 已有独立评测给出了对 Jev 不利的结论。** 比如 [jev-phishing-bench](https://github.com/anisselbd/jev-phishing-bench) 在钓鱼邮件判断上准确率低于 Claude Haiku 4.5；[jev-spam-eval](https://github.com/bitnovus/jev-spam-eval) 显示训练过的 TF-IDF 基线在垃圾邮件上仍有竞争力。**它的护城河是延迟和成本，不总是准确率。**
+**2. 已有独立评测给出了对 Jev 不利的结论——但细读之后结论更微妙，值得每个人花十分钟。**
+
+[jev-phishing-bench](https://github.com/anisselbd/jev-phishing-bench)（2000 封邮件）是目前最扎实的一份：
+
+- 直接问 Jev「该不该点这个链接」，准确率 **62.6%**，Claude Haiku 4.5 是 **81.3%**。**单问一个复合判断，Jev 输得很干脆。**
+- 但在**同一次调用**里把它拆成 5 个信号问题，再在代码里做逻辑回归，准确率到 **95.0%**。
+- 冷水在这里：作者被质疑后补了对照——**一条两行的正则规则就有 91.8%**，比 Jev 最好的单信号（89.4%）还高；把同样 5 个问题问 Haiku，回归后 93.2%，和 Jev 的 95.0% 统计上打平（p = 0.063），且 Haiku 的 AUROC 更高。
+- Jev 真正保住的是价格：同样的分解便宜约 **27 倍**，延迟 239ms vs 687ms。
+
+[jev-spam-eval](https://github.com/bitnovus/jev-spam-eval)（18,514 封邮件）则给出了对 Jev **有利**的一面：一段写出来的垃圾邮件定义拿到 **98.3%**，和拿 ~14,800 条标注训练的 TF-IDF（98.4%）打平；**换到 2026 年的新邮件，Jev 仍有 97.3%，TF-IDF 掉到 72.5%**——规则写得好，抗分布漂移的能力远强于在旧数据上训练的模型。
+
+**三条可以直接拿走的结论：**
+
+1. **别拿它当一个「万能判断器」单问复合问题**，那是它最弱的用法；
+2. **拆成多个原子信号 + 你自己的组合逻辑**，效果能从 62.6% 跳到 95.0%——这正是官方[组合打分模式](https://docs.typesafe.ai/patterns/composite-scoring)在说的事；
+3. **上之前先跑传统基线。** 正则、TF-IDF 这些老办法在窄任务上依然能打，Jev 的稳定优势是**成本、延迟和抗漂移**，不是绝对准确率。
 
 **3. 官方自己公布了能力毛边。** [Jev 1.13 jaggedness](https://docs.typesafe.ai/model-jaggedness/jev-1.13) 列了已知失败模式，这一点值得表扬，也意味着**上生产前必须自己跑一遍你的数据**。
 

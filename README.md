@@ -5,37 +5,77 @@
 [![License](https://img.shields.io/badge/license-CC0--1.0-black.svg?style=flat-square)](LICENSE)
 [![自动收录](https://img.shields.io/badge/热门项目-每日自动收录-black.svg?style=flat-square)](#-热门项目自动榜)
 
-**Jev 是一个不说话的前沿模型。** 给它一段状态和一组带类型的问题，它在 70–500ms 内并行作答：选一个选项、打一个分、或给一个 0–1 的真值概率，每个答案自带校准置信度。不生成一个字，因此结构上无法幻觉。
+2026 年 9 月 15 日，TypeSafe 发布了第一款模型 Jev。它不生成文本。
 
-这是 [Jev / TypeSafe System One](https://typesafe.ai) 生态的中文精选，外加两份从零写起的中文指南。
+你给它一段状态和一组带类型的问题，它在 70 到 500 毫秒内并行作答：从你给的选项里选一个，在你给的量表上打一个分，或者给一个 0 到 1 的真值概率。每个答案附一个校准过的置信度。输入 $0.042 / MTok，输出不计费。
 
-<sub>非官方整理，与 TypeSafe AI 无隶属关系 · Jev 于 2026-09-15 开放 early access · 厂商自评数据已标注，见 [冷静看待](#-冷静看待)</sub>
+TypeSafe 由前 OpenAI 研究员 Diogo Almeida 创办，他是 InstructGPT 论文的作者之一。公司在隐身状态下做了两年，带 4000 万美元种子轮走出，称这是一类新的模型——System One 模型。
+
+这是该生态的中文精选列表，外加两份中文指南。
+
+<sub>非官方整理，与 TypeSafe AI 无隶属关系 · 厂商自评数据已标注，见 [冷静看待](#-冷静看待)</sub>
 
 ---
 
 ## 目录
 
-**入门** — [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
+**入门** — [官方资源](#-官方资源) · [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
 
 **项目** — [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
 
-**资料** — [官方资源](#-官方资源) · [Cookbook 与模式](#-cookbook-与模式) · [文章](#-文章) · [社区](#-社区) · [冷静看待](#-冷静看待)
+**资料** — [Cookbook 与模式](#-cookbook-与模式) · [文章](#-文章) · [社区](#-社区) · [冷静看待](#-冷静看待)
+
+---
+
+## 📘 官方资源
+
+| 资源 | 说明 |
+| :-- | :-- |
+| [TypeSafe 官网](https://typesafe.ai) | 官网、waitlist、产品介绍 |
+| [文档首页](https://docs.typesafe.ai/introduction) | 入门、原语、模式、API、SDK |
+| [Quick start](https://docs.typesafe.ai/introduction/quickstart) | 最短上手路径，下面 [上手](#-上手) 一节是它的中文版 |
+| [Playground](https://console.typesafe.ai/playground) | 浏览器里粘 state、加问题、看类型化结果 |
+| [API Keys 控制台](https://console.typesafe.ai/settings/keys) | 拿 `TYPESAFE_API_KEY` |
+| [HTTP API 参考](https://docs.typesafe.ai/api) | `POST https://api.typesafe.ai/v1/systemone` |
+| [Models](https://docs.typesafe.ai/models) | 模型 ID、价格、上下文与速率限制 |
+| [Confidence](https://docs.typesafe.ai/confidence) | 置信度的语义与用法，必读 |
+| [State 概念](https://docs.typesafe.ai/concepts/state) | 怎么组织喂进去的状态 |
+| [System One 概念](https://docs.typesafe.ai/concepts/system-one) | 这类模型到底是什么 |
+| [How to build with TypeSafe](https://docs.typesafe.ai/concepts/how-to-build-with-system-one) | 官方的架构心法 |
+| [用例地图](https://docs.typesafe.ai/concepts/use-case-map) | 官方列的适用场景全景 |
+| [AI 入门读本](https://docs.typesafe.ai/introduction/machine-learning-primer) | 给非 ML 背景工程师的铺垫 |
+| [Jev 1.13 能力毛边](https://docs.typesafe.ai/model-jaggedness/jev-1.13) | 官方公布的已知失败模式，上生产前必读 |
+| [Workflow evals](https://evals.typesafe.ai) | 官方公开的评测方法与结果，属厂商自评 |
+| [Agent skill 文档](https://docs.typesafe.ai/agent-skill) | 给 Claude Code / Codex 等编程 Agent 的技能包 |
+| [GitHub 组织 `typesafe-ai`](https://github.com/typesafe-ai) | 官方开源仓库 |
+| [法务条款](https://docs.typesafe.ai/legal) | 数据使用与合规 |
+
+官方博文，四篇立场文章：
+
+| 博文 | 内容 |
+| :-- | :-- |
+| [Introducing System One Models and Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | 发布博文。架构、RLCD、定价、Doom 与 Wikiracing demo、FAQ |
+| [The Bitterest Lesson](https://typesafe.ai/blog/bitterest-lesson) | 它的核心论点：优化错了任务，规模再大也盖不过去 |
+| [AI: too good to be true, too bad to be useful](https://typesafe.ai/blog/ai-too-good-to-be-true-too-bad-to-be-useful-typesafe-ai) | 为什么自动化不该用偏好对齐过的聊天模型 |
+| [Manifesto](https://typesafe.ai/manifesto) | 主张给软件用的机器原生智能，而不是聊天 |
 
 ---
 
 ## 🧠 Jev 是什么
 
-它针对一份 state（邮件、日志、工单、游戏坐标 JSON）评估一组带类型的问题，返回代码能直接 `if`、排序、路由的值。TypeSafe 称之为 **System One 模型**，取自卡尼曼的「系统一」；训练方法是自研的 **RLCD**，优化目标是概率诚实而非人类偏好。
+大模型生成文本，Jev 不生成。它针对一份 state——一封邮件、一行日志、一个工单、一坨游戏坐标 JSON——评估一组带类型的问题，返回代码能直接 `if`、排序、路由的值。
 
-| | 大语言模型（System Two） | **Jev（System One）** |
+TypeSafe 把这类模型叫 System One 模型，取自卡尼曼的「系统一」，即快速、直觉的那套思维。训练方法是自研的 RLCD，优化目标是概率诚实，而不是人类偏好。
+
+| | 大语言模型 | Jev |
 | :-- | :-- | :-- |
 | 输出 | 字符串，逐 token 生成 | 类型化的值 + 概率 + 置信度 |
-| 幻觉 | 可能编造、可能违反 schema | **结构上不可能**——合法输出在 schema 里提前穷举 |
-| 延迟 | 秒级 | **70–500ms**（一次并行 pass 答完所有问题）<sup>[官方]</sup> |
-| 输入价格 | $/MTok 通常在 $0.1–$15 | **$0.042 / MTok** |
-| 输出价格 | 按 token 计费，通常更贵 | **免费**（官方原话：too cheap to meter） |
-| 会写代码/文章吗 | 会 | **完全不会**，这是设计而不是缺陷 |
-| 适合 | 生成、推理、对话、写代码 | 分类、路由、打分、抽取、过滤、选下一步动作 |
+| 幻觉 | 可能编造，可能违反 schema | 结构上不可能，合法输出已在 schema 里穷举 |
+| 延迟 | 秒级 | 70–500ms，一次并行 pass 答完所有问题 |
+| 输入价格 | 通常 $0.1–$15 / MTok | $0.042 / MTok |
+| 输出价格 | 按 token 计费 | 不计费 |
+| 写代码、写文章 | 会 | 完全不会，这是设计 |
+| 擅长 | 生成、推理、对话 | 分类、路由、打分、抽取、过滤、选下一步动作 |
 
 可以把它当成一次前沿智能的函数调用：非结构化状态进，类型化概率决策出。
 
@@ -245,40 +285,6 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | 59 | [**shantanugoel/mario-jev**](https://github.com/shantanugoel/mario-jev) `🆕` | ![](https://badgen.net/github/stars/shantanugoel/mario-jev) | — | Python | — |
 | 60 | [**jon-devlapaz/jev-me**](https://github.com/jon-devlapaz/jev-me) `🆕` | ![](https://badgen.net/github/stars/jon-devlapaz/jev-me) | — | Python | jev-me is grill-me with jev |
 <!-- HOT:END -->
-
----
-
-## 📘 官方资源
-
-| 资源 | 说明 |
-| :-- | :-- |
-| [TypeSafe 官网](https://typesafe.ai) | 官网、waitlist、产品介绍 |
-| [文档首页](https://docs.typesafe.ai/introduction) | 入门、原语、模式、API、SDK 全在这 |
-| [Quick start](https://docs.typesafe.ai/introduction/quickstart) | 最短上手路径，本列表上面那段就是它的中文版 |
-| [Playground](https://console.typesafe.ai/playground) | 浏览器里粘 state、加问题、看类型化结果 |
-| [API Keys 控制台](https://console.typesafe.ai/settings/keys) | 拿 `TYPESAFE_API_KEY` |
-| [HTTP API 参考](https://docs.typesafe.ai/api) | `POST https://api.typesafe.ai/v1/systemone` |
-| [Models](https://docs.typesafe.ai/models) | 模型 ID、价格、上下文与速率限制 |
-| [Confidence](https://docs.typesafe.ai/confidence) | 置信度语义与用法，**必读** |
-| [State 概念](https://docs.typesafe.ai/concepts/state) | 怎么组织喂进去的状态 |
-| [System One 概念](https://docs.typesafe.ai/concepts/system-one) | 这类模型到底是什么 |
-| [How to build with TypeSafe](https://docs.typesafe.ai/concepts/how-to-build-with-system-one) | 官方的架构心法 |
-| [用例地图](https://docs.typesafe.ai/concepts/use-case-map) | 官方列的适用场景全景 |
-| [AI 入门读本](https://docs.typesafe.ai/introduction/machine-learning-primer) | 给非 ML 背景工程师的铺垫 |
-| [**Jev 1.13 能力毛边**](https://docs.typesafe.ai/model-jaggedness/jev-1.13) | 官方主动公布的已知失败模式，**上生产前必读** |
-| [Workflow evals](https://evals.typesafe.ai) | 官方公开的评测方法与各模型结果（**厂商自评**） |
-| [Agent skill 文档](https://docs.typesafe.ai/agent-skill) | 给 Claude Code / Codex 等编程 Agent 的技能包 |
-| [GitHub 组织 `typesafe-ai`](https://github.com/typesafe-ai) | 官方开源仓库 |
-| [法务条款](https://docs.typesafe.ai/legal) | 数据使用与合规 |
-
-**官方博文（三篇立场文，建议按顺序读）：**
-
-| 博文 | 讲了什么 |
-| :-- | :-- |
-| [Introducing System One Models and Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | 发布博文：架构、RLCD、定价、Doom / Wikiracing demo、FAQ |
-| [The Bitterest Lesson](https://typesafe.ai/blog/bitterest-lesson) | 优化错了任务，规模再大也盖不过去 |
-| [AI: too good to be true, too bad to be useful](https://typesafe.ai/blog/ai-too-good-to-be-true-too-bad-to-be-useful-typesafe-ai) | 为什么自动化不该用偏好对齐过的聊天模型 |
-| [Manifesto](https://typesafe.ai/manifesto) | 主张给软件用的机器原生智能，而不是聊天 |
 
 ---
 

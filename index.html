@@ -173,7 +173,8 @@
     .deck-control svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
     .slide-count { display: grid; min-width: 68px; place-items: center; border-left: 1px solid var(--line); letter-spacing: .08em; }
     .deck-dots { display: flex; align-items: center; gap: 7px; padding: 0 12px; border-left: 1px solid var(--line); }
-    .deck-dot { width: 5px; height: 5px; padding: 0; background: var(--line); transition: width .18s ease, background .18s ease; }
+    /* 只过渡 background：width 是 layout 属性，动画它会触发重排 */
+    .deck-dot { width: 5px; height: 5px; padding: 0; background: var(--line); transition: background .18s ease; }
     .deck-dot:hover { background: var(--muted); }
     .deck-dot.active { width: 18px; background: var(--ink); }
     .deck-control:focus-visible, .deck-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }

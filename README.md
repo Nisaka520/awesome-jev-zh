@@ -23,9 +23,9 @@
 
 ## 目录
 
-**入门** — [官方资源](#-官方资源) · [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
+**入门** — [官方资源](#-官方资源) · [优质项目](#-优质项目) · [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
 
-**项目** — [优质项目](#-优质项目) · [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
+**项目** — [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
 
 **资料** — [Cookbook 与模式](#-cookbook-与模式) · [文章](#-文章) · [社区](#-社区) · [冷静看待](#-冷静看待)
 
@@ -64,6 +64,32 @@
 | [The Bitterest Lesson](https://typesafe.ai/blog/bitterest-lesson) | 它的核心论点：优化错了任务，规模再大也盖不过去 |
 | [AI: too good to be true, too bad to be useful](https://typesafe.ai/blog/ai-too-good-to-be-true-too-bad-to-be-useful-typesafe-ai) | 为什么自动化不该用偏好对齐过的聊天模型 |
 | [Manifesto](https://typesafe.ai/manifesto) | 主张给软件用的机器原生智能，而不是聊天 |
+
+---
+
+## ⭐ 优质项目
+
+Star 过 500 的项目，全生态一共这些。时间有限就先看这一栏，方向从浏览器操作、Agent 框架、上下文工程一直排到几个能自己训的开源复现。
+
+> 门槛是**纯 Star 数**（2026-09-20 UTC 快照，表里的徽章实时更新）。Star 多只说明被最多人看过、试过、吵过，不等于代码质量好或者能直接上生产——这里面大半是 Jev 发布一周内写出来的。表格按星数降序，所以第一行是个规模完全不同的项目，看说明就明白了。每行都标了它所在的分区，想看同方向的其他项目往那儿翻。
+
+| 项目 | Star | 方向 | 说明 |
+| :-- | :-- | :-- | :-- |
+| [**OpenByteInc/QuantDinger**](https://github.com/OpenByteInc/QuantDinger) | ![](https://badgen.net/github/stars/OpenByteInc/QuantDinger) | 交易系统 | 开源交易 OS，下单前的决策网关从 LLM 换成 Jev（走 `/v1/systemone`，没配 key 就回退 LLM）。**它的 Star 主要来自交易系统本身，Jev 只是一个可选组件**，放在这儿是因为规则只看星数。同类见 [应用](#-应用) |
+| [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | 浏览器 Agent | 全生态第一爆款。一次请求里让 Jev 同时选出「做什么操作」和「操作哪个 DOM 元素」，只有真要打字时才叫小模型。Google Flights 苏黎世→伦敦订票 **7 秒 / $0.0039**。同类见 [应用](#-应用) |
+| [**vercel/eve**](https://github.com/vercel/eve) | ![](https://badgen.net/github/stars/vercel/eve) | Agent 框架 | Vercel 的 Agent 框架，实验性 `autoModel` 默认用 Gateway 上的 `typesafe-ai/jev` 从白名单里挑语言模型。目前把 Jev 放进默认路径的主流框架，就这一个。同类见 [Agent 工具](#-agent-工具) |
+| [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | 上下文工程 | Claude Code 插件：把上下文压缩的「总结」换成 Jev 判断——每次工具调用和结果都打分，决定留不留。**上下文工程的新范式**，[Agent 工具](#-agent-工具) 里的 winnow、yoshi 都是同一思路的变体 |
+| [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 开源复现 | 最受关注的复现，原名 `openjev`。一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本。**不是 TypeSafe 的模型**，作者自己也强调无隶属关系。同类见 [复现与评测](#-复现与评测) |
+| [**NandhaKishorM/laya**](https://github.com/NandhaKishorM/laya) | ![](https://badgen.net/github/stars/NandhaKishorM/laya) | 多语言决策模型 | 非自回归 System 1 决策引擎：单问题 33ms、批量 7.2ms/问（T4 自测），同样用严格评分规则做 RL，**覆盖 100+ 语言**——中文场景想找可自建的替代品，这是目前星数最高的一个。作者称此路线早于 Jev，README 里与 Jev 的同数据集对比属自评 |
+| [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | 链上交易 | 每个 Monad 区块对 Kuru 的 MON-USDC 做一次买卖决策——区块时间摆在那儿，这是少数几个「延迟本身就是硬约束」的场景。在线：[jev-trader.vercel.app](https://jev-trader.vercel.app/) |
+| [**vinnylarouge/jevlike**](https://github.com/vinnylarouge/jevlike) | ![](https://badgen.net/github/stars/vinnylarouge/jevlike) | 开源复现 | 训练一个小的单次 scorer：上下文 + N 个文本选项 → 每个选项一个概率。含 Doom / 国际象棋视觉 demo。**明确声明不是 TypeSafe 架构或 RLCD 的复现** |
+| [**TianyuCodings/NanoJev**](https://github.com/TianyuCodings/NanoJev) | ![](https://badgen.net/github/stars/TianyuCodings/NanoJev) | 开源复现 | nano 版 Jev：并行决策、动态候选、端到端训练流水线。**想搞懂训练的从这个读** |
+| [**typesafe-ai/skills**](https://github.com/typesafe-ai/skills) | ![](https://badgen.net/github/stars/typesafe-ai/skills) | 官方技能包 | 官方出的 Agent 技能包：原语、模式、怎么组织 evaluation。`claude plugin install typesafe@typesafe-ai`。其余官方仓库见 [官方资源](#-官方资源) 与 [SDK](#-sdk-与客户端) |
+| [**Anil-matcha/awesome-jev-by-typesafe**](https://github.com/Anil-matcha/awesome-jev-by-typesafe) | ![](https://badgen.net/github/stars/Anil-matcha/awesome-jev-by-typesafe) | 清单 | 英文清单里做得最细的一份：用例、模式、prompt、起步代码，每条都标了出处。其他同类见 [其他 awesome 列表](#其他-awesome-列表) |
+| [**jaredpalmer/kev**](https://github.com/jaredpalmer/kev) | ![](https://badgen.net/github/stars/jaredpalmer/kev) | 开源复现 | Qwen 上挂 LoRA + readout head（0.5B–8B），`POST /v1/systemone` 与官方 SDK 兼容，改个 `base_url` 就能跑本地。冻结评测集上域外 kev-8b 0.77 对真 Jev 0.86（作者自测）。M5 上 1h45m 能训出 0.5B |
+| [**awlevin/typesafe-computer-use**](https://github.com/awlevin/typesafe-computer-use) | ![](https://badgen.net/github/stars/awlevin/typesafe-computer-use) | computer use | macOS computer-use：OCR 屏幕 → Jev 分类下一步动作 → 点击。约 **$0.0002/步** |
+
+剩下的项目按用途分在 [SDK](#-sdk-与客户端)、[应用](#-应用)、[Demo](#-demo)、[Agent 工具](#-agent-工具)、[复现与评测](#-复现与评测) 五栏里，每天重抓的完整榜单在 [热门自动榜](#-热门项目自动榜)。
 
 ---
 
@@ -231,24 +257,6 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ---
 
-## ⭐ 优质项目
-
-Star 过 1k 的五个项目。时间有限的话，看这五个就够——方向也刚好岔开：浏览器操作、Agent 框架、上下文工程、开源复现、链上实时决策。
-
-> 门槛是**纯 Star 数**（快照取自 2026-09-20 UTC，表里的徽章是实时的）。Star 多只说明被最多人看过、试过、吵过，不等于代码质量好或者能直接上生产——这五个里有四个是发布一周内写出来的。下面每一行都标了它所在的分区，想看同方向的其他项目就往那儿翻。
-
-| 项目 | Star | 方向 | 说明 |
-| :-- | :-- | :-- | :-- |
-| [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | 浏览器 Agent | 全生态第一爆款。一次请求里让 Jev 同时选出「做什么操作」和「操作哪个 DOM 元素」，只有真要打字时才叫小模型。Google Flights 苏黎世→伦敦订票 **7 秒 / $0.0039**。同类见 [应用](#-应用) |
-| [**vercel/eve**](https://github.com/vercel/eve) | ![](https://badgen.net/github/stars/vercel/eve) | Agent 框架 | Vercel 的 Agent 框架，实验性 `autoModel` 默认用 Gateway 上的 `typesafe-ai/jev` 从白名单里挑语言模型。目前把 Jev 放进默认路径的主流框架，就这一个。同类见 [Agent 工具](#-agent-工具) |
-| [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | 上下文工程 | Claude Code 插件：把上下文压缩的「总结」换成 Jev 判断——每次工具调用和结果都打分，决定留不留。**上下文工程的新范式**，[Agent 工具](#-agent-工具) 里的 winnow、yoshi 都是同一思路的变体 |
-| [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 开源复现 | 最受关注的复现，原名 `openjev`。一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本。**不是 TypeSafe 的模型**，作者自己也强调无隶属关系。想弄懂技术细节，读它比读官方博文快。同类见 [复现与评测](#-复现与评测) |
-| [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | 链上交易 | 每个 Monad 区块对 Kuru 的 MON-USDC 做一次买卖决策——区块时间摆在那儿，这是少数几个「延迟本身就是硬约束」的场景。在线：[jev-trader.vercel.app](https://jev-trader.vercel.app/)。同类见 [应用](#-应用) |
-
-剩下的项目按用途分在 [SDK](#-sdk-与客户端)、[应用](#-应用)、[Demo](#-demo)、[Agent 工具](#-agent-工具)、[复现与评测](#-复现与评测) 五栏里，每天重抓的完整榜单在 [热门自动榜](#-热门项目自动榜)。
-
----
-
 ## 📈 热门项目自动榜
 
 这一段由脚本每天重抓重排，人工精选区不受影响。收录与去噪逻辑都在 [`collect_hot.py`](scripts/collect_hot.py)，发现误收可以补进 [`denylist.txt`](scripts/denylist.txt)。星数高只说明关注度高，不代表质量好，把它当作「大家在往哪个方向探索」的信号更合适。
@@ -368,6 +376,7 @@ Star 过 1k 的五个项目。时间有限的话，看这五个就够——方�
 
 | 项目 | Star | 说明 |
 | :-- | :-- | :-- |
+| [**OpenByteInc/QuantDinger**](https://github.com/OpenByteInc/QuantDinger) | ![](https://badgen.net/github/stars/OpenByteInc/QuantDinger) | 开源交易 OS（加密 / 股票 / 外汇，含回测与实盘）：下单前的决策网关从 LLM 换成 Jev，走 `/v1/systemone`，没配 key 就回退 LLM。Jev 在这里是可选组件，但接得完整，文档里连超时和降级路径都写了 |
 | [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | 全生态第一爆款。Browser Use 官方出品的浏览器 Agent：一次请求里让 Jev 同时选出「做什么操作」和「操作哪个 DOM 元素」，只有真要打字时才叫小模型。Google Flights 苏黎世→伦敦订票 **7 秒 / $0.0039**。附库、本地 inspector 与测时 |
 | [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | Claude Code 插件：把上下文压缩的「总结」换成 Jev 判断——每次工具调用和结果都打分，决定留不留。**上下文工程的新范式** |
 | [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | 每个 Monad 区块对 Kuru 的 MON-USDC 做一次买卖决策。在线：[jev-trader.vercel.app](https://jev-trader.vercel.app/) |
@@ -464,8 +473,10 @@ Star 过 1k 的五个项目。时间有限的话，看这五个就够——方�
 | 项目 | Star | 说明 |
 | :-- | :-- | :-- |
 | [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 最受关注的复现（原名 `openjev`）：一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本 |
+| [**NandhaKishorM/laya**](https://github.com/NandhaKishorM/laya) | ![](https://badgen.net/github/stars/NandhaKishorM/laya) | 多语言非自回归 System 1 决策引擎：choice / score / noul 单次前向，33ms 一问、批量 7.2ms 一问（T4 自测），**覆盖 100+ 语言**，权重与 Colab demo 都在 Hugging Face 上。作者称这条路线早于 Jev，README 里与 Jev 的同数据集对比属作者自评 |
 | [**vinnylarouge/jevlike**](https://github.com/vinnylarouge/jevlike) | ![](https://badgen.net/github/stars/vinnylarouge/jevlike) | 训练一个小的单次 scorer：上下文 + N 个文本选项 → 每个选项一个概率。含 Doom / 国际象棋视觉 demo 与 Wikispeedia 下一跳例子。**明确声明不是 TypeSafe 架构或 RLCD 的复现** |
 | [**TianyuCodings/NanoJev**](https://github.com/TianyuCodings/NanoJev) | ![](https://badgen.net/github/stars/TianyuCodings/NanoJev) | nano 版 Jev：并行决策、动态候选、端到端训练流水线。**想搞懂训练的从这个读** |
+| [**jaredpalmer/kev**](https://github.com/jaredpalmer/kev) | ![](https://badgen.net/github/stars/jaredpalmer/kev) | Qwen 上挂 LoRA + readout head（0.5B / 0.6B / 4B / 8B），block-causal mask 保证问题之间互相看不见，打包与分开请求的结果对到 4e-6。`POST /v1/systemone` 与官方 SDK 兼容，改 `base_url` 即可本地跑。冻结评测集域外分：kev-4b 0.76、kev-8b 0.77、真 Jev 0.86（作者自测） |
 | [**ekzhang/openjev-sglang**](https://github.com/ekzhang/openjev-sglang) | ![](https://badgen.net/github/stars/ekzhang/openjev-sglang) | 基于开源模型的 Jev 兼容 API 端点（prefill-only） |
 | [**hr98w/jev-visual**](https://github.com/hr98w/jev-visual) | ![](https://badgen.net/github/stars/hr98w/jev-visual) | Apple Silicon 上的 Jev 风格视觉推理教学实验：共享上下文、直接给候选打分 |
 | [**Mapika/decider**](https://github.com/Mapika/decider) | ![](https://badgen.net/github/stars/Mapika/decider) | 基于 Qwen3.5-2B 微调：一次前向给出类型化决策和校准概率 |

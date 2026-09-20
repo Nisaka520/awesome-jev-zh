@@ -23,7 +23,7 @@
 
 ## 目录
 
-**入门** — [官方资源](#-官方资源) · [优质项目](#-优质项目) · [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
+**入门** — [官方资源](#-官方资源) · [优质项目](#-优质项目) · [Jev 是什么](#-jev-是什么) · [体验渠道](#-体验渠道) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
 
 **项目** — [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
 
@@ -101,6 +101,33 @@ TypeSafe 管这类模型叫 System One，取自卡尼曼的「系统一」，快
 
 **这套说法目前没有公开论文。** 校准好不好，在你自己的数据上量，别信任何人的 slide。
 
+<details>
+<summary><b>那它背后到底是什么技术？</b>（官方不说，但开源复现已经把机制拼出来了）</summary>
+
+官方**刻意没有公开架构**：参数量、模型类别、训练数据组成全部未披露，发布博文的 FAQ 里「为什么需要新的训练算法」「这个结果怎么做到的」两条明写了不在本文回答。所以下面分两块——官方声称的，和复现者实际做出来的。
+
+**官方声称的三点**
+
+- 叫 System One 模型，取自卡尼曼的「系统一」
+- 训练方法 RLCD，优化目标是概率校准而非人类偏好（无论文、无公式、无算法步骤）
+- **并行而非自回归**：「一次查询生成全部输出」，不逐 token 解码——40–200 倍加速归因于此，但没给数学解释
+
+**复现者做出来的机制**（这部分有代码可读，比官方博文实在）
+
+[jaredpalmer/kev](https://github.com/jaredpalmer/kev) 的说明最清楚，它用 Qwen 2.5-0.5B ~ 3-8B 作骨干 + LoRA（r=16）：
+
+- **不解码，用 pointer head 打分**——把每个选项的 `</opt>` 隐状态与 `<decide>` 隐状态相互打分，再过 softmax。概率来自这个打分头的监督训练，不是 next-token 预测
+- **一次前向答完多题**——所有问题和 state 打包进同一条 token 序列，用 **block-causal 注意力掩码**让每个问题都能看到 state、但看不到兄弟问题；每个问题分支的 position id 重新计数，所以**问题顺序不影响结果**。作者实测打包请求与拆开单发的结果一致到 `4e-6`
+- **训练**：在选项分布上做交叉熵，训练数据和线上请求走同一个渲染器。学习率是关键，5e-5 比默认 2e-4 好，高了会「侵蚀基座模型已有的知识」
+
+[TheoLeeCJ/SemIf](https://github.com/TheoLeeCJ/SemIf)（直接读选项 logits）、[TianyuCodings/NanoJev](https://github.com/TianyuCodings/NanoJev)、[vinnylarouge/jevlike](https://github.com/vinnylarouge/jevlike) 三家路子一致。所以公开可验证的那部分机制可以概括成一句：**一个普通的 transformer 骨干，外挂一个在候选项上打分的 readout head，一次前向把所有题答完，靠掩码保证题与题之间互相看不见。**
+
+这也解释了它的几个硬边界：选项必须预先穷举（所以 Choice 上限 255）、不可能输出 schema 之外的东西（结构上做不到幻觉）、以及为什么它彻底不会写字——模型里根本没有解码这一步。
+
+注意复现者都声明过与 TypeSafe 无隶属关系，也没说自己复现了 RLCD。**上面是「一个能跑出类似行为的合理机制」，不是 TypeSafe 的实现。**
+
+</details>
+
 | | 大语言模型 | Jev |
 | :-- | :-- | :-- |
 | 输出 | 字符串，逐 token 生成 | 类型化的值 + 概率 + 置信度 |
@@ -146,17 +173,156 @@ TypeSafe 管这类模型叫 System One，取自卡尼曼的「系统一」，快
 
 ---
 
+## 🚪 体验渠道
+
+「我想试试 Jev」这件事，今天一共有五条路：**免密钥试用**、**托管网关**、**官方直连**、**无 key 先写代码**、**自己跑**。官方那条要排 waitlist，但完全不必干等。
+
+下面每条都标了要不要排队、要不要付钱、以及我踩到的坑。**标「实测」的数字来自 2026-09-19 我在自己机器上的真实调用**，脚本见各小节；标「官方」的来自厂商文档，两者别混着看。
+
+| 渠道 | 要排队 | 要付钱 | 模型 ID | 延迟（实测中位） | 一句话 |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| [**classifier.dev**](https://classifier.dev/) | 不用 | **完全免费，连注册都不用** | 上报 `jev-1.13.0` | 220ms 逐条 · **20ms 批量** | 想立刻摸到真 Jev 就走这条，代价是只剩「分类」一个功能 |
+| [**Vercel AI Gateway**](https://vercel.com/ai-gateway/models/jev) | 不用 | **要绑信用卡**，送 $5 | `typesafe-ai/jev` | 310–370ms | 三个原语齐全的最快路径，绑卡这关劝退不少人 |
+| [TypeSafe 官方 API](https://console.typesafe.ai/settings/keys) | **要** | 看配额 | `jev-latest` / `jev-1.13.0` | 官方称 70–500ms | 功能最全、延迟最低，但得等 |
+| [官方 Playground](https://console.typesafe.ai/playground) | 看账号 | — | — | — | 不写代码，粘一段 state 点几下 |
+| [官方 adapter](https://github.com/typesafe-ai/system-one-adapter-python) | 不用 | 用你自己的 LLM key | — | 取决于后端 | 先把代码写完，后端暂时挂普通 LLM |
+| [OpenRouter](https://openrouter.ai/typesafe/jev-1.13) | — | — | `typesafe/jev-1.13` | — | **暂时别指望**，见下 |
+| 开源复现（[kev](https://github.com/jaredpalmer/kev) · [SemIf](https://github.com/TheoLeeCJ/SemIf) · [laya](https://github.com/NandhaKishorM/laya)） | 不用 | 自己的显卡 | 自己训 | 看硬件 | 唯一能完全离线、数据不出内网的路子，见 [复现与评测](#-复现与评测) |
+
+### 零门槛：classifier.dev
+
+**不用注册、不用 key、不用绑卡，一条 curl 就能碰到真的 Jev 1.13。** 目前门槛最低的一条路，没有之一：
+
+```bash
+curl "https://classifier.dev/billing,technical,sales/我的信用卡被扣了两次款"
+# billing
+```
+
+要拿结构化结果就走 POST，返回体里会写清楚到底调了什么模型：
+
+```bash
+curl -X POST https://classifier.dev/ -H "Content-Type: application/json" \
+  -d '{"input":"线上全挂了，所有接口 502","labels":["billing","technical","sales"]}'
+```
+
+```json
+{
+  "tier": "fast",
+  "model": "jev-1.13.0",
+  "modelsUsed": ["jev-1.13.0"],
+  "results": [{ "label": "technical", "confidence": 1,
+                "scores": { "billing": 0, "technical": 1, "sales": 0 } }]
+}
+```
+
+字段名有个小坑：单条用 `input`，批量用 `inputs`（传数组，最多 1000 条）；写成 `text` / `texts` 会返回 `no_input` 错误。
+
+官方给的免费额度是 fast 档 3,000 次/分钟、20,000 次/天（按 IP 算），smart 档 200/分钟、2,000/天；Pro $20/月按账号放大十倍。
+
+### classifier.dev 和 Jev 是什么关系
+
+先说最容易误会的一点：**它不是 Jev 的竞品，它是搭在 Jev 上的。** 返回体里的 `"model": "jev-1.13.0"` 和官方直连是同一个模型同一个版本。所以「谁更准」这个问题本身问错了——同样的输入，它们给的是同一个答案。
+
+真正的区别在**你能往里喂多少信息**，以及**出事时会发生什么**：
+
+| | classifier.dev | Jev 直连（官方 / Gateway） |
+| :-- | :-- | :-- |
+| 门槛 | 无注册、无 key、无卡 | Gateway 要绑卡；官方要排队 |
+| 能用的原语 | 只有分类，即 Choice 的一个子集 | Choice / Score / Noul 三个都有 |
+| 一次请求问几题 | 1 题 | 多题并行，**实测加到 4 题延迟不变** |
+| 选项能否带描述 | **不能，只能给标签词** | 能，`criteria` 里每个选项都能写说明 |
+| 批量 | 一次最多 1,000 条，实测 **20ms/条** | 按请求算 |
+| 出错时 | Jev 不可用会**静默回退到一串 LLM**（官方说明），要看 `modelsUsed` 才知道 | 报错就是报错 |
+| smart 档 | 不确定的答案升级到推理模型，实测最慢 **3.5s** | 无此概念 |
+| 计费 | 免费 / $20 月订阅 | $0.042 / MTok |
+
+那个「选项能否带描述」不是小事。我用同一份中文数据量过，**光给标签词比给带描述的标签，准确率掉 13.3 个百分点**（80.0% → 93.3%，3 轮完全复现）。Jev 直连的 `criteria` 能写「支付、扣款、发票、退款、订阅账单」，classifier.dev 只能收一个 `billing`——差的就是这个。
+
+所以选型很清楚：**摸底、原型、一次性脚本用 classifier.dev；真要上生产，尤其是需要 Score / Noul、需要一次问多题、或者不接受静默回退的，走直连。**
+
+### 中文场景小实测
+
+这份列表里一直缺中文数据，我补一组。15 条中文客服工单，我自己标的部门与紧急度，走 Vercel Gateway 直连 Jev，一次请求同时问三题（Choice 路由 + boolean 紧急 + Score 不满程度）：
+
+| 指标 | 结果 |
+| :-- | :-- |
+| 部门路由准确率 | **14/15 = 93.3%** |
+| 紧急度准确率 | **14/15 = 93.3%** |
+| 延迟 | 最快 281 / 中位 370 / p95 448 ms |
+| 唯一错判 | 「优惠券输进去提示无效，但明明还没过期」判成 technical（conf 0.85），我标的是 billing |
+
+> **这不是评测，别当评测引用。** n=15、标签我一个人定的、错判那条本身就模棱两可（优惠券失效算账单问题还是程序问题？换成人也会犹豫）。它只够说明「中文没有明显掉链子」，不够支撑任何百分比结论。严肃的中文评测目前仍然只有 [judgekit](#独立评测) 一份。
+
+有两个现象值得单独记一笔：
+
+**一，批量比逐条准。** 同样 15 条数据，一条条发准确率 80%，塞进一个请求发是 15/15，3 轮完全一致、不是噪声。推测是同一批里的其他样本给了模型相对参照。这条在官方文档里没见人提过，**如果你的场景能攒批，攒批不只是快，可能还更准**。
+
+**二，confidence 在中文上偏饱和。** 15 条里 12 条直接给 1.00。唯一那条错判确实掉到了 0.85，最低的 0.70 反而是对的——所以拿 confidence 做门控在这份数据上能用，但阈值别卡太高，1.00 出现得太频繁了。上生产前务必在你自己的数据上重新量，这也是官方 [Confidence 文档](https://docs.typesafe.ai/confidence) 反复强调的。
+
+### 本地部署：完全离线的几条路
+
+数据不能出内网、或者延迟要压到实时交互那个量级（语音、控制回路）的时候，托管渠道就不够看了。Jev 本身没有开放权重，但几个开源复现已经能跑出同类行为，**其中 laya 是唯一进入实时区间的**：
+
+| 方案 | 骨干 | 参数 | 单题延迟 | 批量 | 硬件 | 原语 | 许可 |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| [**laya-multilingual**](https://github.com/NandhaKishorM/laya) | mmBERT-base | **322M** | **32.8 ms** | **7.2 ms/题** | 单张 T4 | choice / score / noul 全有 | Apache-2.0 |
+| [laya](https://github.com/NandhaKishorM/laya) | ModernBERT-large | 421M | 39.5 ms | 15.9 ms/题 | 单张 T4 | 同上 | Apache-2.0 |
+| [kev-0.5b](https://github.com/jaredpalmer/kev) | Qwen2.5-0.5B + LoRA | 0.5B | ~160 ms (fp32) | — | 消费级即可 | typed questions | Apache-2.0 |
+| [kev-4b](https://github.com/jaredpalmer/kev) | Qwen3-4B + LoRA | 4B | ~1 s (bf16) | 3 题 277ms (M5) | 32GB Mac | typed questions | Apache-2.0 |
+| [SemIf](https://github.com/TheoLeeCJ/SemIf) | Qwen3.5-4B | 4B | 1.02 s | 20 决策/秒（共享 state） | RTX 3090 / MLX | 直读选项 logits | MIT |
+
+两点值得单独说：
+
+**kev 的卖点是 API 兼容。** `python -m kev.serve --run jaredpalmer/kev-4b --port 8009` 起一个 `/v1/systemone` 端点，官方 SDK 改个 `base_url` 就切过来了——**先拿官方 API 把代码写完，再无痛换本地**，这条路径目前只有它提供。代价是慢：4B 在 Apple Silicon 上约 1 秒。冻结测试集上 kev-4b 0.790 对真 Jev 0.857（作者自测，764 条）。
+
+**laya 的中文表现是这几个里最好的，而且它不是 4B 大模型，是个 322M 的编码器。** 51 种语言的 MASSIVE intent（20 选项，随机基线 0.05）上 `zh-CN` 拿 0.630、`zh-TW` 0.540，zh-CN 在整个语言表里排前列；作者自测 laya 对 Jev 在 typed-decisions 上 0.766 对 0.727、AG News 0.950 对 0.910（厂商自评性质，自己复现一遍再信）。
+
+#### 另一条路：本地起一个 Jev 兼容的 `/v1/systemone`
+
+上面那张表是「换一个自己的模型」。还有一类项目不换 API——**在本机起一个官方协议的端点，官方 SDK 改个 `TYPESAFE_BASE_URL` 就切过去了**。按「概率是怎么来的」分成三种，差别比看上去大得多：
+
+| 方案 | 概率从哪来 | 后端 | 代价 |
+| :-- | :-- | :-- | :-- |
+| [**githubnext/localjev**](https://github.com/githubnext/localjev) | **提示模型自己报** | 任意 OpenAI 兼容端点（默认 oMLX 上的 DiffusionGemma 26B-A4B-4bit） | 最好装，但绕回了生成+解析+重试 |
+| [razorback16/openjev](https://github.com/razorback16/openjev) | **真从 logits 读** | 打了补丁的 vLLM | 概率是真的，但依赖未合入的 vLLM 扩展 |
+| [ekzhang/openjev-sglang](https://github.com/ekzhang/openjev-sglang) | 真从 logits 读（prefill-only） | SGLang | 同上，装起来有门槛 |
+
+**localjev 是 GitHub Next 出的**，TypeScript/Bun 写的一层**协议桥，自己不做推理**：把 state 和带类型的问题翻译成一个分类 prompt → 发给上游 LLM → 要它吐 JSON 概率标量/向量 → 校验、格式错就重试（`LOCALJEV_MALFORMED_RETRIES` 默认 2）→ 归一化 → 算出 choice、期望分、熵置信度 → 按 Jev 的响应格式返回。
+
+它的 README 把取舍写得很坦白，值得原样引用：**wire-compatible, but not mathematically equivalent**——「概率是模型生成／自报的，不是直接从 logits 读的，上生产前请在你自己的负载上验证校准」。
+
+所以要清楚自己换来了什么：**协议兼容，但 Jev 想消灭的那一圈全回来了**——逐 token 生成、解析 JSON、schema 校验、失败重试。延迟和成本是完整 LLM 的量级，不是 System One 的量级。它真正的价值是**在没有 Jev key 的机器上把代码跑通**，以及拿它的 bake-off 脚本横向比不同本地模型（仓库里有一份 M5 Max 上 1,200 请求的评测报告，跑了 AG News / BoolQ / SST-5，作者明确说是小样本筛选而非定论）。
+
+想要真概率就得往下走一层：openjev 用 DiffusionGemma 的一步 structured read 直接拿 logprobs，但依赖 vLLM 未合入的 `diffusion_seed_canvas`、`diffusion_read_only` 等扩展。**准确和易装，目前只能二选一。**
+
+> 顺带澄清一个容易混的点：[SemIf](https://github.com/TheoLeeCJ/SemIf) 曾用名也叫 `openjev`，和上面 razorback16 的 `openjev` **是两个不相干的项目**。
+
+> **部署上有个坑能直接毁掉延迟优势**：默认 `max_loaded=1`，如果请求在不同语言间来回切，模型会**每个请求重建一次**——实测 CPU 上中位 7.4 秒、T4 上 10.3 秒。上生产务必预加载并放大 `max_loaded`，否则 33ms 会变成 10 秒。
+
+### 坑清单
+
+按踩到的概率排，前四条都是我这次真撞上的：
+
+| 坑 | 说明 |
+| :-- | :-- |
+| **Vercel 必须绑信用卡** | 不绑卡任何请求都是 `403 customer_verification_required`，跟 key 对不对无关。绑完才给 $5 免费额度，**额度从你第一次请求开始起算** |
+| **Gateway 上 `noul` 改名叫 `boolean`** | 官方 API 是 `{"type":"noul"}` 返回 `noul` 字段；Gateway 只认 `'boolean' \| 'choice' \| 'score'`，返回 `probability`。照官方文档抄过去直接报错 |
+| **`criteria` 必填，而且三种类型形状不同** | Choice 要**对象**（`{"billing":"说明"}`），Score 要**数组**（`["低","中","高"]`），boolean 不要。Choice 写成 `options` / `choices` 都不认 |
+| **jev 不能走 `/v1/chat/completions`** | 它是 evaluation 类型模型，走聊天端点会明确报错 `is an evaluation model, not a language model`。Gateway 的原生端点是 `POST /v1/evaluate` |
+| **`ai` 包要 7.0.103 以上** | `experimental_evaluate` 是 7.0.103 才加的，7.0.102 及以前没有这个导出。或者直接用 `@ai-sdk/typesafe-ai` |
+| **npm 上的 `typesafe-sdk` 不是官方包** | 那是个 0.0.0 的占位包，跟 TypeSafe 无关。官方 JS 是 `@typesafe-ai/sdk`；`pip install typesafe-sdk` 才是对的（PyPI 上是官方的） |
+| **免费层有速率限制** | 实测连发十几次就会撞 `429 rate_limit_exceeded`（提示 upstream 高负载），退避重试即可。买了 credits 才进付费层放宽限制 |
+| **一旦买了 credits 就没有月度免费额度了** | 官方原话：购买后账号转入付费层，monthly free credit 不再适用。只想白嫖就别充值 |
+| **Spend Management 管不住 AI Gateway** | 文档明写暂停项目 *does not stop AI Gateway API key usage*。要限额得用 Gateway 自己的 [Budgets](https://vercel.com/docs/ai-gateway/observability-and-spend/budgets)，可以按 team / 项目 / 单个 key / 成员分别设 |
+| **Auto top-up 记得保持关闭** | 默认就是关的，别手滑打开，否则余额见底会自动扣款续费 |
+| **OpenRouter 还没真正上线** | 有模型页，但 2026-09-19 实测 `/api/v1/models` 返回的 446 个模型里没有 jev。别照着它写代码 |
+| **Gateway 元数据里 `context_window` 写 32000** | 对应官方的「state + 最长问题 ≤ 32k」那一项，不是 64k 总量；另外 `max_tokens` 报 0，某些会校验这个字段的框架会被卡住 |
+
+---
+
 ## ⚡ 上手
 
-官方直连需要排 waitlist，不过不必干等——下面几条路现在就能动手：
-
-| 路径 | 模型 ID | 要不要 waitlist | 适合谁 |
-| :-- | :-- | :-- | :-- |
-| [Vercel AI Gateway](https://vercel.com/ai-gateway/models/jev) | `typesafe-ai/jev` | 不用 | 最省事，[已官方上线](https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway)，走 AI SDK 的 `experimental_evaluate` |
-| [官方 adapter](https://github.com/typesafe-ai/system-one-adapter-python) | — | 不用 | 没 key 也能先写代码：接口一致的替身，后端换成普通 LLM |
-| [TypeSafe 官方 API](https://console.typesafe.ai/settings/keys) | `jev-latest` / `jev-1.13.0` | 要排队 | 完整 SDK、最低延迟、企业配额 |
-| [Playground](https://console.typesafe.ai/playground) | — | 看账号 | 不写代码，粘一段 state 点几下 |
-| [OpenRouter](https://openrouter.ai/typesafe/jev-1.13) | `typesafe/jev-1.13` | 待确认 | 有模型页，但其 `/api/v1/models` 尚未列出，调用前请自行确认 |
+渠道怎么选、各自有什么坑，都在上一节 [体验渠道](#-体验渠道)。这一节只讲代码——以官方 Python SDK 为例，其他渠道换个客户端，问题的写法是一样的。
 
 ```bash
 pip install typesafe-sdk        # 或 uv add typesafe-sdk
@@ -385,6 +551,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | [**devagrawal09/jev-review**](https://github.com/devagrawal09/jev-review) | ![](https://badgen.net/github/stars/devagrawal09/jev-review) | 分阶段代码审查工作流 + 本地 dashboard，由一串聚焦的 Jev 调用驱动 |
 | [**droidrun/mobile-jev**](https://github.com/droidrun/mobile-jev) | ![](https://badgen.net/github/stars/droidrun/mobile-jev) | Android Agent，每次点击由 Jev 决定。打开 Uber、旧金山机场→金门大桥，**21 秒 / 9 步**到支付页，**不需要 ADB** |
 | [**realZachi/pg-jev**](https://github.com/realZachi/pg-jev) | ![](https://badgen.net/github/stars/realZachi/pg-jev) | PostgreSQL 扩展：**直接在 SQL 里用自然语言问你的表**。`WHERE jev_noul(comment, '这是投诉') > 0.8` 这种写法 |
+| [**classifier.dev**](https://classifier.dev/) | — | **托管的零门槛分类 API，底座就是 Jev 1.13**（返回体里写着 `model: jev-1.13.0`）。不用注册、不用 key、不用绑卡，一条 curl 就能跑；批量一次 1,000 条，实测 20ms/条。代价是只剩分类一个原语、选项不能带描述、Jev 挂了会静默回退到 OpenRouter 上的 LLM 链（看 `modelsUsed` 字段才知道）。对比见 [体验渠道](#-体验渠道) |
 | [**kitze/skillbox**](https://github.com/kitze/skillbox) | ![](https://badgen.net/github/stars/kitze/skillbox) | 自托管、带版本的 Agent 技能库，MCP + 作用域客户端，可选用 Jev 做技能推荐 |
 | [**lakeday-org/perch**](https://github.com/lakeday-org/perch) | ![](https://badgen.net/github/stars/lakeday-org/perch) | AST 驱动的语义 code lint |
 | [**kitze/unclutter**](https://github.com/kitze/unclutter) | ![](https://badgen.net/github/stars/kitze/unclutter) | Chrome / Firefox 扩展：Jev 标出页面上不重要的元素，本地按页面模板记住，下次访问直接藏 |
@@ -478,6 +645,8 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | [**TianyuCodings/NanoJev**](https://github.com/TianyuCodings/NanoJev) | ![](https://badgen.net/github/stars/TianyuCodings/NanoJev) | nano 版 Jev：并行决策、动态候选、端到端训练流水线。**想搞懂训练的从这个读** |
 | [**jaredpalmer/kev**](https://github.com/jaredpalmer/kev) | ![](https://badgen.net/github/stars/jaredpalmer/kev) | Qwen 上挂 LoRA + readout head（0.5B / 0.6B / 4B / 8B），block-causal mask 保证问题之间互相看不见，打包与分开请求的结果对到 4e-6。`POST /v1/systemone` 与官方 SDK 兼容，改 `base_url` 即可本地跑。冻结评测集域外分：kev-4b 0.76、kev-8b 0.77、真 Jev 0.86（作者自测） |
 | [**ekzhang/openjev-sglang**](https://github.com/ekzhang/openjev-sglang) | ![](https://badgen.net/github/stars/ekzhang/openjev-sglang) | 基于开源模型的 Jev 兼容 API 端点（prefill-only） |
+| [**githubnext/localjev**](https://github.com/githubnext/localjev) | ![](https://badgen.net/github/stars/githubnext/localjev) | GitHub Next 出的**协议桥**（TypeScript/Bun）：本机起一个 Jev 兼容的 `/v1/systemone`，背后转成分类 prompt 发给任意 OpenAI 兼容端点（默认 oMLX 上的 DiffusionGemma）。**概率是模型自报的，不是读 logits**，作者自己写明「wire-compatible, but not mathematically equivalent」。附 AG News / BoolQ / SST-5 的多模型 bake-off 脚本。详见 [体验渠道](#-体验渠道) |
+| [**razorback16/openjev**](https://github.com/razorback16/openjev) | ![](https://badgen.net/github/stars/razorback16/openjev) | DiffusionGemma 上的 Jev 兼容决策服务，用一步 structured read **真从 logits 拿概率**；代价是依赖 vLLM 未合入的 `diffusion_seed_canvas`、`diffusion_read_only` 等扩展。注意与曾用名相同的 [SemIf](https://github.com/TheoLeeCJ/SemIf) 无关 |
 | [**hr98w/jev-visual**](https://github.com/hr98w/jev-visual) | ![](https://badgen.net/github/stars/hr98w/jev-visual) | Apple Silicon 上的 Jev 风格视觉推理教学实验：共享上下文、直接给候选打分 |
 | [**Mapika/decider**](https://github.com/Mapika/decider) | ![](https://badgen.net/github/stars/Mapika/decider) | 基于 Qwen3.5-2B 微调：一次前向给出类型化决策和校准概率 |
 | [**kshetrajna12/reflex**](https://github.com/kshetrajna12/reflex) | ![](https://badgen.net/github/stars/kshetrajna12/reflex) | 小型开放决策模型：state + 类型化问题 → 校准概率 |

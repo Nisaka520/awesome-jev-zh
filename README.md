@@ -275,7 +275,38 @@ curl -X POST https://classifier.dev/ -H "Content-Type: application/json" \
 
 **kev 的卖点是 API 兼容。** `python -m kev.serve --run jaredpalmer/kev-4b --port 8009` 起一个 `/v1/systemone` 端点，官方 SDK 改个 `base_url` 就切过来了——**先拿官方 API 把代码写完，再无痛换本地**，这条路径目前只有它提供。代价是慢：4B 在 Apple Silicon 上约 1 秒。冻结测试集上 kev-4b 0.790 对真 Jev 0.857（作者自测，764 条）。
 
-**laya 的中文表现是这几个里最好的，而且它不是 4B 大模型，是个 322M 的编码器。** 51 种语言的 MASSIVE intent（20 选项，随机基线 0.05）上 `zh-CN` 拿 0.630、`zh-TW` 0.540，zh-CN 在整个语言表里排前列；作者自测 laya 对 Jev 在 typed-decisions 上 0.766 对 0.727、AG News 0.950 对 0.910（厂商自评性质，自己复现一遍再信）。
+**laya 的中文表现是这几个里最好的，而且它不是 4B 大模型，是个 322M 的编码器。** 51 种语言的 MASSIVE intent（20 选项，随机基线 0.05）上 `zh-CN` 拿 0.630、`zh-TW` 0.540，zh-CN 在整个语言表里排前列。
+
+作者还自测了 laya 对 Jev：typed-decisions 0.766 对 0.727、AG News 0.950 对 0.910、DAIR Emotion 0.595 对 0.480。**我们复现了后两项，结论只对了一半**（各 400 条，托管的真 Jev 1.13 走 Vercel AI Gateway，两种提示写法都试过取各自最好的）：
+
+| | 本地 laya（fp32） | 真 Jev 1.13 |
+| :-- | --: | --: |
+| AG News | **92.8%** | 85.5%（原生 criteria）／88.0%（classifier.dev） |
+| dair-ai emotion | 54.0% | **61.5%**（原生 criteria）／62.7%（classifier.dev） |
+
+AG News 上 laya 确实赢，方向与作者自评一致；**但 emotion 上方向是反的**——作者称 laya 0.595 胜 Jev 0.480，实测是 Jev 赢 8–9 个点。细粒度情绪分类要用 laya 的，务必先在自己的数据上量。
+
+另一条容易踩的：**提示写法不能跨模型迁移。** 同一个任务，给选项加描述对两者的影响方向相反——AG News 上 laya +1.6 / Jev −2.5，emotion 上 laya −7.2 / Jev +1.4。换模型必须重调。
+
+#### 把上面这些跑到 CPU 上：EdgeJev
+
+> 利益相关：[**yzfly/edgejev**](https://github.com/yzfly/edgejev) 是本清单维护者写的，刚发布，star 数还不够进 [优质项目](#-优质项目) 那一栏。放在这里是因为它正好解决这一节的问题，数据都可以自己复现。
+
+上面那张表的延迟大多是 GPU 上的数字。laya 自己的提示里写着 CPU 上 `~200-500 ms`——真要落到没有显卡的机器上，得先做一轮 ONNX + 量化。EdgeJev 把这一步打包成 `build / serve / eval / bench` 四个命令，**运行时只要 onnxruntime + tokenizers + numpy，不需要 torch**，Linux / macOS（Apple Silicon 走 CoreML）/ Windows 都能跑。
+
+```bash
+pip install 'edgejev[build]'
+edgejev build --backend laya --out ./jev-int8   # 只此一步要 torch，转完可卸载
+edgejev serve --model ./jev-int8 --port 8009    # 官方协议的 /v1/systemone
+```
+
+4 vCPU Xeon（AVX512-VNNI）上，`laya-multilingual` 单题 **15.6 ms**、三题一次 44.8 ms，体积 1290 MB → 324 MB；`--precision fp32` 与上游 PyTorch **逐位一致**（最大概率偏差 0.00000）。
+
+顺带记三个量化上的坑，都是实测：
+
+* **动态量化会让结果依赖 batch。** fp32 ONNX 单条与批量差 `0.000e+00`，int8 动态差 **2.43**——激活 scale 在运行时按实际张量算，padding 一变就变。对一个卖校准概率的模型是硬伤，要可复现就固定 `batch=1` 或用 fp32。
+* **别用 QUInt8。** 同 8 bit 同体积，但 x86 的 VNNI 只对有符号 int8 有快路径：实测 QUInt8 27.9 ms、QInt8 15.6 ms。（ARM 走 SDOT，不适用此条。）
+* **保留嵌入表不量化没用。** 322M 里 196.6M 是 256k 词表的嵌入表，看着像精度大头，保留后精度没回来（91.0% / 51.5%），体积反而从 325 MB 涨到 915 MB。
 
 #### 另一条路：本地起一个 Jev 兼容的 `/v1/systemone`
 

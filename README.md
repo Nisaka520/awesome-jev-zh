@@ -295,8 +295,8 @@ AG News 上 laya 确实赢，方向与作者自评一致；**但 emotion 上方�
 上面那张表的延迟大多是 GPU 上的数字。laya 自己的提示里写着 CPU 上 `~200-500 ms`——真要落到没有显卡的机器上，得先做一轮 ONNX + 量化。EdgeJev 把这一步打包成 `build / serve / eval / bench` 四个命令，**运行时只要 onnxruntime + tokenizers + numpy，不需要 torch**，Linux / macOS（Apple Silicon 走 CoreML）/ Windows 都能跑。
 
 ```bash
-pip install 'edgejev[build]'
-edgejev build --backend laya --out ./jev-int8   # 只此一步要 torch，转完可卸载
+uv tool install "edgejev[build]"
+edgejev build --backend laya --out ./jev-int8   # 只此一步要 torch
 edgejev serve --model ./jev-int8 --port 8009    # 官方协议的 /v1/systemone
 ```
 

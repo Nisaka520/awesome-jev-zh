@@ -25,7 +25,7 @@
 
 **入门** — [官方资源](#-官方资源) · [Jev 是什么](#-jev-是什么) · [上手](#-上手) · [规格与定价](#-规格与定价) · [该用与不该用](#-该用与不该用) · [中文指南](#-中文指南)
 
-**项目** — [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
+**项目** — [优质项目](#-优质项目) · [热门自动榜](#-热门项目自动榜) · [SDK](#-sdk-与客户端) · [应用](#-应用) · [Demo](#-demo) · [Agent 工具](#-agent-工具) · [复现与评测](#-复现与评测)
 
 **资料** — [Cookbook 与模式](#-cookbook-与模式) · [文章](#-文章) · [社区](#-社区) · [冷静看待](#-冷静看待)
 
@@ -231,6 +231,23 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ---
 
+## ⭐ 优质项目
+
+Star 过 1k 的四个项目。时间有限的话，看这四个就够——它们刚好分别代表四个方向：浏览器操作、Agent 框架、上下文工程、开源复现。
+
+> 门槛是**纯 Star 数**（快照取自 2026-09-19 UTC，表里的徽章是实时的）。Star 多只说明被最多人看过、试过、吵过，不等于代码质量好或者能直接上生产——这四个里有三个是发布一周内写出来的。下面每一段都给了它所在的分区，想看同方向的其他项目就往那儿翻。
+
+| 项目 | Star | 方向 | 说明 |
+| :-- | :-- | :-- | :-- |
+| [**browser-use/jev-ultrafast**](https://github.com/browser-use/jev-ultrafast) | ![](https://badgen.net/github/stars/browser-use/jev-ultrafast) | 浏览器 Agent | 全生态第一爆款。一次请求里让 Jev 同时选出「做什么操作」和「操作哪个 DOM 元素」，只有真要打字时才叫小模型。Google Flights 苏黎世→伦敦订票 **7 秒 / $0.0039**。同类见 [应用](#-应用) |
+| [**vercel/eve**](https://github.com/vercel/eve) | ![](https://badgen.net/github/stars/vercel/eve) | Agent 框架 | Vercel 的 Agent 框架，实验性 `autoModel` 默认用 Gateway 上的 `typesafe-ai/jev` 从白名单里挑语言模型。目前把 Jev 放进默认路径的主流框架，就这一个。同类见 [Agent 工具](#-agent-工具) |
+| [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | 上下文工程 | Claude Code 插件：把上下文压缩的「总结」换成 Jev 判断——每次工具调用和结果都打分，决定留不留。**上下文工程的新范式**，[Agent 工具](#-agent-工具) 里的 winnow、yoshi 都是同一思路的变体 |
+| [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 开源复现 | 最受关注的复现，原名 `openjev`。一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本。**不是 TypeSafe 的模型**，作者自己也强调无隶属关系。想弄懂技术细节，读它比读官方博文快。同类见 [复现与评测](#-复现与评测) |
+
+剩下的项目按用途分在 [SDK](#-sdk-与客户端)、[应用](#-应用)、[Demo](#-demo)、[Agent 工具](#-agent-工具)、[复现与评测](#-复现与评测) 五栏里，每天重抓的完整榜单在 [热门自动榜](#-热门项目自动榜)。
+
+---
+
 ## 📈 热门项目自动榜
 
 这一段由脚本每天重抓重排，人工精选区不受影响。收录与去噪逻辑都在 [`collect_hot.py`](scripts/collect_hot.py)，发现误收可以补进 [`denylist.txt`](scripts/denylist.txt)。星数高只说明关注度高，不代表质量好，把它当作「大家在往哪个方向探索」的信号更合适。
@@ -415,7 +432,6 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 | [**typesafe-ai/skills**](https://github.com/typesafe-ai/skills) | ![](https://badgen.net/github/stars/typesafe-ai/skills) | **官方技能包**。Claude Code：`claude plugin marketplace add typesafe-ai/skills` → `claude plugin install typesafe@typesafe-ai`；其他 Agent：`npx skills add typesafe-ai/skills --skill typesafe-ai` |
 | [**NiazMorshed2007/jev-review**](https://github.com/NiazMorshed2007/jev-review) | ![](https://badgen.net/github/stars/NiazMorshed2007/jev-review) | 本地优先 MCP：Claude Code / Codex / Cursor / OpenCode 边写边拿结构化质量审查 |
 | [**gargpratyush/jev-router**](https://github.com/gargpratyush/jev-router) | ![](https://badgen.net/github/stars/gargpratyush/jev-router) | Claude Code 与 Codex 的每轮路由：简单活走快档，难活走强档。`npm i -g jev-router` |
-| [**vlad-terin/jev-use**](https://github.com/vlad-terin/jev-use) | ![](https://badgen.net/github/stars/vlad-terin/jev-use) | Agent skill + 运行时：Codex 规划，Jev 选元素，runner 执行并逐步校验；已扩到桌面工作流，主打「少跑几轮 Codex」 |
 | [**jkudish/jev-mcp**](https://github.com/jkudish/jev-mcp) | ![](https://badgen.net/github/stars/jkudish/jev-mcp) | Node MCP，封装三条 cookbook：`jev_verify` 引文核验、`jev_screen` 注入护栏、`jev_find` 无 embedding 语义排序。`npx -y github:jkudish/jev-mcp` |
 | [**DevMortimer/pi-warden**](https://github.com/DevMortimer/pi-warden) | ![](https://badgen.net/github/stars/DevMortimer/pi-warden) | Pi 护栏：把判决当成 held tool result 而不是弹窗；对照项目规则文件检查写入 |
 | [**dbreunig/building-with-jev-skill**](https://github.com/dbreunig/building-with-jev-skill) | ![](https://badgen.net/github/stars/dbreunig/building-with-jev-skill) | 一个专门教 Agent「怎么写调用 Jev 的程序」的 Skill |
@@ -445,7 +461,7 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 | 项目 | Star | 说明 |
 | :-- | :-- | :-- |
-| [**TheoLeeCJ/openjev**](https://github.com/TheoLeeCJ/openjev) | ![](https://badgen.net/github/stars/TheoLeeCJ/openjev) | 最受关注的复现：一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本 |
+| [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 最受关注的复现（原名 `openjev`）：一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本 |
 | [**vinnylarouge/jevlike**](https://github.com/vinnylarouge/jevlike) | ![](https://badgen.net/github/stars/vinnylarouge/jevlike) | 训练一个小的单次 scorer：上下文 + N 个文本选项 → 每个选项一个概率。含 Doom / 国际象棋视觉 demo 与 Wikispeedia 下一跳例子。**明确声明不是 TypeSafe 架构或 RLCD 的复现** |
 | [**ekzhang/openjev-sglang**](https://github.com/ekzhang/openjev-sglang) | ![](https://badgen.net/github/stars/ekzhang/openjev-sglang) | 基于开源模型的 Jev 兼容 API 端点（prefill-only） |
 | [**hr98w/jev-visual**](https://github.com/hr98w/jev-visual) | ![](https://badgen.net/github/stars/hr98w/jev-visual) | Apple Silicon 上的 Jev 风格视觉推理教学实验：共享上下文、直接给候选打分 |

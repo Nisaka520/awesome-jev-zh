@@ -233,9 +233,9 @@ npx skills add typesafe-ai/skills --skill typesafe-ai  # 其他 Agent
 
 ## ⭐ 优质项目
 
-Star 过 1k 的四个项目。时间有限的话，看这四个就够——它们刚好分别代表四个方向：浏览器操作、Agent 框架、上下文工程、开源复现。
+Star 过 1k 的五个项目。时间有限的话，看这五个就够——方向也刚好岔开：浏览器操作、Agent 框架、上下文工程、开源复现、链上实时决策。
 
-> 门槛是**纯 Star 数**（快照取自 2026-09-19 UTC，表里的徽章是实时的）。Star 多只说明被最多人看过、试过、吵过，不等于代码质量好或者能直接上生产——这四个里有三个是发布一周内写出来的。下面每一段都给了它所在的分区，想看同方向的其他项目就往那儿翻。
+> 门槛是**纯 Star 数**（快照取自 2026-09-20 UTC，表里的徽章是实时的）。Star 多只说明被最多人看过、试过、吵过，不等于代码质量好或者能直接上生产——这五个里有四个是发布一周内写出来的。下面每一行都标了它所在的分区，想看同方向的其他项目就往那儿翻。
 
 | 项目 | Star | 方向 | 说明 |
 | :-- | :-- | :-- | :-- |
@@ -243,6 +243,7 @@ Star 过 1k 的四个项目。时间有限的话，看这四个就够——它�
 | [**vercel/eve**](https://github.com/vercel/eve) | ![](https://badgen.net/github/stars/vercel/eve) | Agent 框架 | Vercel 的 Agent 框架，实验性 `autoModel` 默认用 Gateway 上的 `typesafe-ai/jev` 从白名单里挑语言模型。目前把 Jev 放进默认路径的主流框架，就这一个。同类见 [Agent 工具](#-agent-工具) |
 | [**tamaratran/fast-jev-compaction**](https://github.com/tamaratran/fast-jev-compaction) | ![](https://badgen.net/github/stars/tamaratran/fast-jev-compaction) | 上下文工程 | Claude Code 插件：把上下文压缩的「总结」换成 Jev 判断——每次工具调用和结果都打分，决定留不留。**上下文工程的新范式**，[Agent 工具](#-agent-工具) 里的 winnow、yoshi 都是同一思路的变体 |
 | [**TheoLeeCJ/SemIf**](https://github.com/TheoLeeCJ/SemIf) | ![](https://badgen.net/github/stars/TheoLeeCJ/SemIf) | 开源复现 | 最受关注的复现，原名 `openjev`。一张 RTX 3090 能不能跑 Jev 风格的东西？直接读选项 logits，不生成文本。**不是 TypeSafe 的模型**，作者自己也强调无隶属关系。想弄懂技术细节，读它比读官方博文快。同类见 [复现与评测](#-复现与评测) |
+| [**jarrodwatts/jev-trader**](https://github.com/jarrodwatts/jev-trader) | ![](https://badgen.net/github/stars/jarrodwatts/jev-trader) | 链上交易 | 每个 Monad 区块对 Kuru 的 MON-USDC 做一次买卖决策——区块时间摆在那儿，这是少数几个「延迟本身就是硬约束」的场景。在线：[jev-trader.vercel.app](https://jev-trader.vercel.app/)。同类见 [应用](#-应用) |
 
 剩下的项目按用途分在 [SDK](#-sdk-与客户端)、[应用](#-应用)、[Demo](#-demo)、[Agent 工具](#-agent-工具)、[复现与评测](#-复现与评测) 五栏里，每天重抓的完整榜单在 [热门自动榜](#-热门项目自动榜)。
 
